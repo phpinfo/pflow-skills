@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "pflow-commit": {
+      "source": "phpinfo/pflow-skills",
+      "sourceType": "github",
+      "skillPath": "skills/pflow-commit/SKILL.md",
+      "computedHash": "8758174eacdbc8c9b829410a6196459e8ea03af116d2818e87ceb340dae81da5"
+    }
+  }
+}
