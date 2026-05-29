@@ -1,40 +1,58 @@
 # pflow-skills
 
-Каталог [Agent Skills](https://docs.claude.com/en/docs/claude-code/skills) для использования с [skills.sh](https://github.com/vercel-labs/skills) и любым совместимым агентом (Claude Code, Cursor, OpenCode и др.).
+[![skills.sh](https://skills.sh/b/phpinfo/pflow-skills)](https://skills.sh/phpinfo/pflow-skills)
 
-## Установка
+A curated catalog of [Agent Skills](https://docs.claude.com/en/docs/claude-code/skills) for everyday development workflows — installable into Claude Code, Cursor, OpenCode, and any [skills.sh](https://www.skills.sh/docs)-compatible agent.
 
-Установить все скиллы из этого репозитория:
+Skills are small, composable folders of instructions and scripts that teach your agent to do one task well. No application code here — just the skills.
+
+## Quickstart
+
+Install the whole catalog into the current project (30 seconds):
 
 ```bash
 npx skills add phpinfo/pflow-skills
 ```
 
-Установить конкретный скилл:
+Or pick a single skill:
 
 ```bash
 npx skills add phpinfo/pflow-skills -s pflow-commit
 ```
 
-Флаги: `-g` — глобально (`~/.claude/skills/`), без флага — в проект (`.claude/skills/`); `--copy` — копировать файлы вместо симлинков.
-
-## Скиллы
-
-| Скилл | Описание |
+| Flag | Effect |
 | --- | --- |
-| [pflow-commit](skills/pflow-commit) | Анализ изменений, Conventional Commit на русском, коммит и push. Вызывается вручную. |
+| _(default)_ | Install into the project (`.claude/skills/`) |
+| `-g`, `--global` | Install for every project (`~/.claude/skills/`) |
+| `--copy` | Copy files instead of symlinking |
 
-## Структура
+## Skills
 
-Каждый скилл — это каталог в `skills/` с файлом `SKILL.md` (YAML-фронтматтер: `name`, `description`, `allowed-tools`) и опциональной папкой `scripts/`.
+| Skill | What it does |
+| --- | --- |
+| [`pflow-commit`](skills/pflow-commit) | Analyzes your working tree, writes a [Conventional Commit](https://www.conventionalcommits.org/) message (in Russian, passive past tense), then commits and pushes. Invoked manually. |
+
+## How it works
+
+Each skill is a self-contained folder under `skills/`:
 
 ```
 skills/
-  <skill-name>/
-    SKILL.md
-    scripts/
+└── <name>/
+    ├── SKILL.md        # frontmatter (name, description, allowed-tools) + instructions
+    └── scripts/        # executable helpers the skill calls
 ```
 
-## Создание скилла
+The agent reads every `SKILL.md` description up front and triggers the matching skill when the task fits. Heavy logic lives in `scripts/` so the prompt stays short and reliable.
 
-Добавьте каталог `skills/<name>/` с `SKILL.md`. Описание (`description`) должно ясно указывать, что скилл делает и когда срабатывает — по нему агент решает, применять ли скилл.
+## Creating a skill
+
+1. Add `skills/<name>/SKILL.md` with YAML frontmatter (`name`, `description`, and `allowed-tools` for any scripts).
+2. Make scripts executable and reference them by their **installed** path — `.claude/skills/<name>/scripts/...`.
+3. Add a row to the [Skills](#skills) table above.
+
+Write the `description` to say plainly *what the skill does and when it fires* — it's the signal the agent uses to decide whether to reach for it.
+
+## License
+
+MIT

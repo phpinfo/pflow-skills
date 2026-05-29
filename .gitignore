@@ -1,0 +1,4 @@
+# Skills installed into this repo for local testing (source of truth lives in skills/)
+.claude/
+.agents/
+skills-lock.json
