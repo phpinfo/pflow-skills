@@ -18,7 +18,7 @@ Skills live under `skills/<name>/`. Each skill is a self-contained unit:
 - **Installed-path assumption in scripts.** `scripts/git-commit-push.sh` derives the project root as `SKILL_DIR/../../..`, which only resolves correctly once the skill is installed at `.claude/skills/<name>/`. Keep this 3-levels-up layout when adding scripts that need the consuming repo's root.
 - **`allowed-tools` paths must match the skill folder name.** When renaming or adding a skill, update the `Bash(.claude/skills/<name>/scripts/...)` entries in `SKILL.md` to the new folder name, or the agent won't be granted permission to run them.
 - **Keep SKILL.md minimal.** The body should be the shortest instruction set that still works; push detail/logic into scripts rather than prose. The `description` is the trigger signal — make it state what the skill does and when it fires.
-- **Skill language.** `pflow-commit` produces Russian Conventional Commit messages in passive past tense; its instructions are written in Russian by design.
+- **Conventional Commits.** `pflow-commit` writes Conventional Commit messages in English, imperative mood (`feat: add ...`, not `added`).
 
 ## Adding a skill
 

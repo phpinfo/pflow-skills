@@ -1,43 +1,43 @@
 ---
 name: pflow-commit
-description: Анализирует изменения, формирует Conventional Commit на русском, коммитит и пушит. Вызывается только вручную.
+description: Analyzes the working tree, writes a Conventional Commit message, then commits and pushes. Invoked manually only.
 license: MIT
 allowed-tools:
   - Bash(.claude/skills/pflow-commit/scripts/git-commit-context.sh)
   - Bash(.claude/skills/pflow-commit/scripts/git-commit-push.sh:*)
 ---
 
-При любой ошибке (ненулевой код Shell-команды ИЛИ поле `error` в JSON-выводе) выведи `⚠️ <сообщение ошибки>` и немедленно остановись.
+On any failure (non-zero exit from a Shell command OR an `error` field in JSON output) print `⚠️ <error message>` and stop immediately.
 
-## Шаги
+## Steps
 
-1. Получи контекст: `.claude/skills/pflow-commit/scripts/git-commit-context.sh`. Если вывод — `No changes detected.`, сообщи, что коммитить нечего, и остановись.
-2. Составь ТЕКСТ_СООБЩЕНИЯ (см. формат ниже).
-3. Закоммить и запушь: `.claude/skills/pflow-commit/scripts/git-commit-push.sh --message "ТЕКСТ_СООБЩЕНИЯ"`. Скрипт печатает JSON: `{commit_hash, branch_name, push_status}` при успехе или `{…, error:{step, message}}` при сбое. Если есть `error` — выведи `⚠️ <error.message>` и остановись.
-4. Ответь строго, подставив значения из JSON:
+1. Get the context: `.claude/skills/pflow-commit/scripts/git-commit-context.sh`. If the output is `No changes detected.`, tell the user there is nothing to commit and stop.
+2. Compose MESSAGE (see format below).
+3. Commit and push: `.claude/skills/pflow-commit/scripts/git-commit-push.sh --message "MESSAGE"`. The script prints JSON: `{commit_hash, branch_name, push_status}` on success, or `{…, error:{step, message}}` on failure. If `error` is present, print `⚠️ <error.message>` and stop.
+4. Reply exactly, substituting values from the JSON:
 
    ```text
-   ✅ Сообщение коммита:
-   ТЕКСТ_СООБЩЕНИЯ
+   ✅ Commit message:
+   MESSAGE
 
-   ✅ Закоммичено и запушено:
+   ✅ Committed and pushed:
    Hash: <commit_hash> | Branch: <branch_name> | Status: <push_status>
    ```
 
 ## Gotchas
 
-- `git-commit-push.sh` делает `git add -A` — в коммит попадут ВСЕ изменения рабочего дерева, а не только относящиеся к сообщению. Учитывай это при составлении текста.
-- Контекст из шага 1 усечён: максимум 50 строк на файл и 600 строк суммарно. Большие диффы видны не полностью — не делай выводов об отрезанной части.
-- `push_status`: `pushed` (upstream уже был) либо `pushed_with_upstream` (создан через `git push -u origin <branch>`).
-- Ошибки git скрипт push не пишет в stderr — они попадают в JSON-поле `error`. Всегда проверяй его (шаг 3), иначе провал коммита/пуша останется незамеченным.
+- `git-commit-push.sh` runs `git add -A` — the commit includes ALL working-tree changes, not just the ones your message describes. Account for this when composing the text.
+- The context from step 1 is truncated: at most 50 lines per file and 600 lines total. Large diffs are shown only partially — don't draw conclusions about the cut-off part.
+- `push_status`: `pushed` (upstream already existed) or `pushed_with_upstream` (created via `git push -u origin <branch>`).
+- The push script does not write git errors to stderr — they go into the JSON `error` field. Always check it (step 3), otherwise a failed commit/push goes unnoticed.
 
-## Формат сообщения (Conventional Commits)
+## Message format (Conventional Commits)
 
-`<type>[(scope)][!]: <описание>` + опционально пустая строка, body, footer'ы.
+`<type>[(scope)][!]: <description>` plus an optional blank line, body, and footer(s).
 
-- Типы: `feat` (MINOR), `fix` (PATCH), `build`, `chore`, `ci`, `docs`, `style`, `refactor`, `perf`, `test`, `revert`.
-- Breaking change: `!` в заголовке или footer `BREAKING CHANGE: ...` (MAJOR).
-- `scope` — только если полезен. Выбирай самый узкий корректный тип; разные типы → разные коммиты.
-- Описание — кратко, на русском, в пассивной форме прошедшего времени.
+- Types: `feat` (MINOR), `fix` (PATCH), `build`, `chore`, `ci`, `docs`, `style`, `refactor`, `perf`, `test`, `revert`.
+- Breaking change: `!` in the header or a `BREAKING CHANGE: ...` footer (MAJOR).
+- `scope` — only when it adds value. Pick the narrowest correct type; split unrelated types into separate commits.
+- Description — short, in English, imperative mood ("add", not "added").
 
-Примеры: `feat: добавлена страница пользователя` · `fix(parser): обработан пустой ввод` · `feat!: удалён старый флоу авторизации`
+Examples: `feat: add user page` · `fix(parser): handle empty input` · `feat!: remove legacy auth flow`

@@ -30,7 +30,7 @@ npx skills add phpinfo/pflow-skills -s pflow-commit
 
 | Skill | What it does |
 | --- | --- |
-| [`pflow-commit`](skills/pflow-commit) | Analyzes your working tree, writes a [Conventional Commit](https://www.conventionalcommits.org/) message (in Russian, passive past tense), then commits and pushes. Invoked manually. |
+| [`pflow-commit`](skills/pflow-commit) | Analyzes your working tree, writes a [Conventional Commit](https://www.conventionalcommits.org/) message, then commits and pushes. Invoked manually. |
 
 ## How it works
 
