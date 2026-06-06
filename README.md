@@ -31,6 +31,7 @@ npx skills add phpinfo/pflow-skills -s pflow-commit
 | Skill | What it does |
 | --- | --- |
 | [`pflow-commit`](skills/pflow-commit) | Analyzes your working tree, writes a [Conventional Commit](https://www.conventionalcommits.org/) message, then commits and pushes. Invoked manually. |
+| [`pflow-task-next`](skills/pflow-task-next) | Takes the next `mdtodo` task into progress and creates a git branch named for it (`feature/`, `fix/`, `chore/`). Requires a clean working tree on the dev branch. Invoked manually. |
 | [`pflow-task-finish`](skills/pflow-task-finish) | Closes the current `mdtodo` task; when `pflow-commit` is installed, branches the work, commits it, and merges into `dev`. Degrades to mdtodo-only with a warning otherwise. Invoked manually. |
 
 ## Configuration
@@ -44,7 +45,7 @@ Most skills work with zero configuration. `pflow-task-finish` accepts optional s
 | Argument | Required | Description |
 | --- | --- | --- |
 | `--message "<msg>"` | yes (when committing) | Conventional Commit message for the finished work. Ignored in fallback mode (no `pflow-commit`), where no commit happens. |
-| `--slug "<slug>"` | no | Kebab-case name for the task branch (`task/<slug>`). Defaults to a slug derived from the current task title. |
+| `--slug "<slug>"` | no | Kebab-case name for the task branch (`task/<slug>`). Defaults to a slug derived from the current task title. Ignored when finishing from a non-dev branch (see below). |
 | `--dev "<branch>"` | no | Branch to merge the task branch into. Highest-priority override of the dev branch (see below). |
 
 **Environment variables** (env or `.env`):
@@ -56,6 +57,23 @@ Most skills work with zero configuration. `pflow-task-finish` accepts optional s
 | `MDTODO_FILE` | `todo.md` | Read directly by the `mdtodo` CLI. `PFLOW_TASKS_MDTODO_FILE` sets this for you; set it yourself if you prefer. |
 
 **Dev-branch precedence:** `--dev` flag → `PFLOW_GIT_DEV_BRANCH` → autodetected `dev`/`develop` → default `dev`. If the resolved branch is absent, the merge target falls back to the branch you started on.
+
+**Branch reuse:** when run from a non-dev branch (e.g. one created by `pflow-task-next`), it commits and merges THAT branch instead of creating `task/<slug>`. Creating `task/<slug>` only happens when finishing straight from the dev branch.
+
+### `pflow-task-next`
+
+**CLI arguments** (`task-next-branch.sh`):
+
+| Argument | Required | Description |
+| --- | --- | --- |
+| `--branch "<type/slug>"` | yes | Name of the branch to create and switch to (e.g. `feature/login-form`). Composed by the agent from the task. |
+
+**Environment variables** (env or `.env`):
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `PFLOW_TASKS_MDTODO_FILE` | _(mdtodo's own default, `todo.md`)_ | Path to the Markdown todo list. Exported as `MDTODO_FILE` before any `mdtodo` call. |
+| `PFLOW_GIT_DEV_BRANCH` | `dev` | Branch the new task branch must be created from. The skill errors unless you are on this branch with a clean working tree. |
 
 > `pflow-task-finish` reuses `pflow-commit`'s git logic. Without `pflow-commit` installed it still closes the task via `mdtodo`, prints a warning, and skips all git steps. `pflow-commit` itself takes no configuration.
 

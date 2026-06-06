@@ -140,14 +140,38 @@ fi
 # shellcheck source=../../pflow-commit/scripts/git-lib.sh
 source "$COMMIT_LIB"
 
-[[ -n "$slug" ]] || slug="$(slugify "$task")"
-[[ -n "$slug" ]] || slug="task"
-task_branch="task/$slug"
-
 started_on="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 
-# Move onto the task branch (carrying the just-closed todo change with us).
-if [[ "$started_on" != "$task_branch" ]]; then
+# Resolve the dev/merge target.
+# Precedence: --dev CLI flag > $PFLOW_GIT_DEV_BRANCH (env/.env) > autodetected
+# dev/develop > default "dev". If the chosen branch does not exist, fall back to
+# merging into the branch we started on.
+if [[ -n "$dev_arg" ]]; then
+	dev_branch="$dev_arg"
+elif [[ -n "${PFLOW_GIT_DEV_BRANCH:-}" ]]; then
+	dev_branch="$PFLOW_GIT_DEV_BRANCH"
+elif git show-ref --verify --quiet refs/heads/develop && ! git show-ref --verify --quiet refs/heads/dev; then
+	dev_branch="develop"
+else
+	dev_branch="dev"
+fi
+if [[ "$dev_branch" != "$started_on" ]] && ! git show-ref --verify --quiet "refs/heads/$dev_branch"; then
+	dev_branch="$started_on"
+fi
+
+# Decide the task branch.
+# If we are already on a work branch (anything other than the dev target — e.g.
+# one created by pflow-task-next), commit and merge THAT branch. Only when
+# finishing straight from the dev branch do we create task/<slug>.
+if [[ "$started_on" != "$dev_branch" ]]; then
+	task_branch="$started_on"
+	[[ -n "$slug" ]] || slug="${started_on##*/}"
+else
+	[[ -n "$slug" ]] || slug="$(slugify "$task")"
+	[[ -n "$slug" ]] || slug="task"
+	task_branch="task/$slug"
+
+	# Move onto the task branch (carrying the just-closed todo change with us).
 	set +e
 	if git show-ref --verify --quiet "refs/heads/$task_branch"; then
 		co_output="$(git checkout "$task_branch" 2>&1)"; co_exit=$?
@@ -181,23 +205,6 @@ has_remote=0
 push_status_task="skipped"
 if [[ "$has_remote" -eq 1 ]]; then
 	if git_push_current; then push_status_task="$GIT_PUSH_STATUS"; else push_status_task="failed"; fi
-fi
-
-# Resolve the dev/merge target.
-# Precedence: --dev CLI flag > $PFLOW_GIT_DEV_BRANCH (env/.env) > autodetected
-# dev/develop > default "dev". If the chosen branch does not exist, fall back to
-# merging into the branch we started on.
-if [[ -n "$dev_arg" ]]; then
-	dev_branch="$dev_arg"
-elif [[ -n "${PFLOW_GIT_DEV_BRANCH:-}" ]]; then
-	dev_branch="$PFLOW_GIT_DEV_BRANCH"
-elif git show-ref --verify --quiet refs/heads/develop && ! git show-ref --verify --quiet refs/heads/dev; then
-	dev_branch="develop"
-else
-	dev_branch="dev"
-fi
-if [[ "$dev_branch" != "$started_on" ]] && ! git show-ref --verify --quiet "refs/heads/$dev_branch"; then
-	dev_branch="$started_on"
 fi
 
 push_status_dev="skipped"

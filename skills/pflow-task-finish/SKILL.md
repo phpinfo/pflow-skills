@@ -26,4 +26,5 @@ On any failure (non-zero exit, or an `error` field / `"status":"error"` in the J
 ## Gotchas
 
 - **`git add -A`** — the commit includes ALL working-tree changes, not just the closed-task markdown; account for that in MESSAGE.
+- **Branch reuse** — when run from a non-dev branch (e.g. one created by `pflow-task-next`), it commits and merges THAT branch and ignores `--slug`. Only when finishing straight from the dev branch does it create `task/<slug>`.
 - **Merge conflict** (`error.step == "git merge"`) leaves the repo on the dev branch mid-merge to resolve by hand.
