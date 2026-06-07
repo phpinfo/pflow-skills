@@ -21,6 +21,7 @@ On any failure (non-zero exit, or an `error` field / `"status":"error"` in the J
    ✅ Task closed: <task>
    Branch: <task_branch> → merged into <dev_branch> (<merge_status>)
    Commit: <commit_hash> (<commit_status>) | push task: <push_status_task> | push dev: <push_status_dev>
+   Cleanup: local <delete_local_status> | remote <delete_remote_status>
    ```
 
 ## Gotchas
@@ -28,3 +29,4 @@ On any failure (non-zero exit, or an `error` field / `"status":"error"` in the J
 - **`git add -A`** — the commit includes ALL working-tree changes, not just the closed-task markdown; account for that in MESSAGE.
 - **Branch reuse** — when run from a non-dev branch (e.g. one created by `pflow-task-next`), it commits and merges THAT branch and ignores `--slug`. Only when finishing straight from the dev branch does it create `task/<slug>`.
 - **Merge conflict** (`error.step == "git merge"`) leaves the repo on the dev branch mid-merge to resolve by hand.
+- **Branch cleanup** — after a successful merge the task branch is deleted locally (`git branch -d`) and on the remote. It's best-effort: failures surface as `failed` in `delete_local_status`/`delete_remote_status` but don't fail the task. No deletion happens when finishing straight on the dev branch (`merge_status == "same_branch"`).

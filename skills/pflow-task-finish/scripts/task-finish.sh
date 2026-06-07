@@ -208,6 +208,8 @@ if [[ "$has_remote" -eq 1 ]]; then
 fi
 
 push_status_dev="skipped"
+delete_local_status="skipped"
+delete_remote_status="skipped"
 if [[ "$dev_branch" == "$task_branch" ]]; then
 	merge_status="same_branch"
 else
@@ -232,12 +234,38 @@ else
 	if [[ "$has_remote" -eq 1 ]]; then
 		if git_push_current; then push_status_dev="$GIT_PUSH_STATUS"; else push_status_dev="failed"; fi
 	fi
+
+	# Merge succeeded: delete the task branch locally and on the remote.
+	# Best-effort — a failed cleanup must not fail the finished task.
+	set +e
+	if git branch -d "$task_branch" >/dev/null 2>&1; then
+		delete_local_status="deleted"
+	else
+		delete_local_status="failed"
+	fi
+	set -e
+
+	if [[ "$has_remote" -eq 1 ]]; then
+		remote="$(git remote | head -n1)"
+		if git ls-remote --exit-code --heads "$remote" "$task_branch" >/dev/null 2>&1; then
+			set +e
+			if git push "$remote" --delete "$task_branch" >/dev/null 2>&1; then
+				delete_remote_status="deleted"
+			else
+				delete_remote_status="failed"
+			fi
+			set -e
+		else
+			delete_remote_status="not_on_remote"
+		fi
+	fi
 fi
 
 commit_hash_json="null"
 [[ -n "$commit_hash" ]] && commit_hash_json="\"$commit_hash\""
 
-printf '{"status":"finished","task":"%s","slug":"%s","task_branch":"%s","dev_branch":"%s","started_on":"%s","commit_hash":%s,"commit_status":"%s","merge_status":"%s","push_status_task":"%s","push_status_dev":"%s"}\n' \
+printf '{"status":"finished","task":"%s","slug":"%s","task_branch":"%s","dev_branch":"%s","started_on":"%s","commit_hash":%s,"commit_status":"%s","merge_status":"%s","push_status_task":"%s","push_status_dev":"%s","delete_local_status":"%s","delete_remote_status":"%s"}\n' \
 	"$(tf_escape "$task")" "$(tf_escape "$slug")" "$(tf_escape "$task_branch")" \
 	"$(tf_escape "$dev_branch")" "$(tf_escape "$started_on")" "$commit_hash_json" \
-	"$commit_status" "$merge_status" "$push_status_task" "$push_status_dev"
+	"$commit_status" "$merge_status" "$push_status_task" "$push_status_dev" \
+	"$delete_local_status" "$delete_remote_status"
