@@ -33,4 +33,6 @@ On any failure (non-zero exit from a Shell command OR an `error` field in JSON o
 
 ## Message format (Conventional Commits)
 
-See `.claude/skills/pflow-commit/reference/commit-format.md` for the full format (types, scope, breaking-change rules, examples). In short: `<type>[(scope)][!]: <description>`, English, imperative mood.
+See `.claude/skills/pflow-commit/reference/commit-format.md` for the full format (types, scope, breaking-change rules, examples). In short: `<type>[(scope)][!]: <description>`, imperative mood.
+
+The commit message MUST always be written in English — regardless of the conversation language.
