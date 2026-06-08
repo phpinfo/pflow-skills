@@ -3,20 +3,20 @@ name: pflow-task-next
 description: Takes the next mdtodo task into progress and creates a git branch named for it. Invoked manually only.
 license: MIT
 allowed-tools:
-  - Bash(.claude/skills/pflow-task-next/scripts/task-next-context.sh)
-  - Bash(.claude/skills/pflow-task-next/scripts/task-next-branch.sh:*)
+  - Bash(.agents/skills/pflow-task-next/scripts/task-next-context.sh)
+  - Bash(.agents/skills/pflow-task-next/scripts/task-next-branch.sh:*)
 ---
 
 On any failure (non-zero exit, or `"status":"error"` in the JSON) print `⚠️ <error.message>` and stop.
 
 ## Steps
 
-1. **Take the task.** Run `.claude/skills/pflow-task-next/scripts/task-next-context.sh`. It prints one JSON line; act on `status`:
+1. **Take the task.** Run `.agents/skills/pflow-task-next/scripts/task-next-context.sh`. It prints one JSON line; act on `status`:
    - `no_tasks` — tell the user there's nothing to take and stop.
    - `error` — print `⚠️ <error.message>` and stop.
    - `ready` — continue with `task.title` and `task.description`.
 2. **Name the branch** from the task (rules below) → `BRANCH = TYPE/SLUG`.
-3. **Create it:** `.claude/skills/pflow-task-next/scripts/task-next-branch.sh --branch "BRANCH"`. On `status:created`, reply:
+3. **Create it:** `.agents/skills/pflow-task-next/scripts/task-next-branch.sh --branch "BRANCH"`. On `status:created`, reply:
 
    ```text
    ✅ Task in progress: <task.title>

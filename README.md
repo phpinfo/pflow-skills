@@ -22,8 +22,8 @@ npx skills add phpinfo/pflow-skills -s pflow-commit
 
 | Flag | Effect |
 | --- | --- |
-| _(default)_ | Install into the project (`.claude/skills/`) |
-| `-g`, `--global` | Install for every project (`~/.claude/skills/`) |
+| _(default)_ | Install into the project (`.agents/skills/`) |
+| `-g`, `--global` | Install for every project (`~/.agents/skills/`) |
 | `--copy` | Copy files instead of symlinking |
 
 ## Skills
@@ -33,12 +33,19 @@ npx skills add phpinfo/pflow-skills -s pflow-commit
 | [`pflow-commit`](skills/pflow-commit) | Analyzes your working tree, writes a [Conventional Commit](https://www.conventionalcommits.org/) message, then commits and pushes. Invoked manually. |
 | [`pflow-task-next`](skills/pflow-task-next) | Takes the next `mdtodo` task into progress and creates a git branch named for it (`feature/`, `fix/`, `chore/`). Requires a clean working tree on the dev branch. Invoked manually. |
 | [`pflow-task-finish`](skills/pflow-task-finish) | Closes the current `mdtodo` task; when `pflow-commit` is installed, branches the work, commits it, and merges into `dev`. Degrades to mdtodo-only with a warning otherwise. Invoked manually. |
+| [`pflow-changelog`](skills/pflow-changelog) | Generates a [Keep a Changelog](https://keepachangelog.com/) entry for the current feature version based on completed tasks and git commits, prepends it to `CHANGELOG.md`, then commits and pushes. Requires a clean working tree on the dev branch. Invoked manually. |
 
 ## Configuration
 
 Most skills work with zero configuration. `pflow-task-finish` accepts optional settings, supplied as **CLI arguments** (passed by the agent to its script) or as **environment variables** — either exported in your shell or placed in a `.env` file at the project root, which the script loads automatically (parsed, never executed; values already set in the real environment take precedence).
 
+### `pflow-commit`
+
+**Requires:** none.
+
 ### `pflow-task-finish`
+
+**Requires:** `pflow-commit` (optional — without it, the task is closed via `mdtodo` but all git steps are skipped with a warning).
 
 **CLI arguments** (`task-finish.sh`):
 
@@ -62,6 +69,8 @@ Most skills work with zero configuration. `pflow-task-finish` accepts optional s
 
 ### `pflow-task-next`
 
+**Requires:** none.
+
 **CLI arguments** (`task-next-branch.sh`):
 
 | Argument | Required | Description |
@@ -75,7 +84,17 @@ Most skills work with zero configuration. `pflow-task-finish` accepts optional s
 | `PFLOW_TASKS_MDTODO_FILE` | _(mdtodo's own default, `todo.md`)_ | Path to the Markdown todo list. Exported as `MDTODO_FILE` before any `mdtodo` call. |
 | `PFLOW_GIT_DEV_BRANCH` | `dev` | Branch the new task branch must be created from. The skill errors unless you are on this branch with a clean working tree. |
 
-> `pflow-task-finish` reuses `pflow-commit`'s git logic. Without `pflow-commit` installed it still closes the task via `mdtodo`, prints a warning, and skips all git steps. `pflow-commit` itself takes no configuration.
+### `pflow-changelog`
+
+**Requires:** `pflow-commit` (reuses `git-lib.sh` for commit/push).
+
+**Environment variables** (env or `.env`):
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `PFLOW_FEATURES_MDTODO_FILE` | _(required)_ | Path to the Markdown features list. Used to determine the current feature and its version. |
+| `PFLOW_TASKS_MDTODO_FILE` | _(mdtodo's own default, `todo.md`)_ | Path to the Markdown tasks list. Used to list completed tasks. |
+| `PFLOW_GIT_DEV_BRANCH` | `dev` | Branch the skill must run on. Errors if current branch differs. |
 
 ## How it works
 
@@ -93,7 +112,7 @@ The agent reads every `SKILL.md` description up front and triggers the matching 
 ## Creating a skill
 
 1. Add `skills/<name>/SKILL.md` with YAML frontmatter (`name`, `description`, and `allowed-tools` for any scripts).
-2. Make scripts executable and reference them by their **installed** path — `.claude/skills/<name>/scripts/...`.
+2. Make scripts executable and reference them by their **installed** path — `.agents/skills/<name>/scripts/...`.
 3. Add a row to the [Skills](#skills) table above.
 
 Write the `description` to say plainly *what the skill does and when it fires* — it's the signal the agent uses to decide whether to reach for it.

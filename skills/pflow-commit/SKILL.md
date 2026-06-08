@@ -3,17 +3,17 @@ name: pflow-commit
 description: Analyzes the working tree, writes a Conventional Commit message, then commits and pushes. Invoked manually only.
 license: MIT
 allowed-tools:
-  - Bash(.claude/skills/pflow-commit/scripts/git-commit-context.sh)
-  - Bash(.claude/skills/pflow-commit/scripts/git-commit-push.sh:*)
+  - Bash(.agents/skills/pflow-commit/scripts/git-commit-context.sh)
+  - Bash(.agents/skills/pflow-commit/scripts/git-commit-push.sh:*)
 ---
 
 On any failure (non-zero exit from a Shell command OR an `error` field in JSON output) print `⚠️ <error message>` and stop immediately.
 
 ## Steps
 
-1. Get the context: `.claude/skills/pflow-commit/scripts/git-commit-context.sh`. If the output is `No changes detected.`, tell the user there is nothing to commit and stop.
+1. Get the context: `.agents/skills/pflow-commit/scripts/git-commit-context.sh`. If the output is `No changes detected.`, tell the user there is nothing to commit and stop.
 2. Compose MESSAGE (see format below).
-3. Commit and push: `.claude/skills/pflow-commit/scripts/git-commit-push.sh --message "MESSAGE"`. The script prints JSON: `{commit_hash, branch_name, push_status}` on success, or `{…, error:{step, message}}` on failure. If `error` is present, print `⚠️ <error.message>` and stop.
+3. Commit and push: `.agents/skills/pflow-commit/scripts/git-commit-push.sh --message "MESSAGE"`. The script prints JSON: `{commit_hash, branch_name, push_status}` on success, or `{…, error:{step, message}}` on failure. If `error` is present, print `⚠️ <error.message>` and stop.
 4. Reply exactly, substituting values from the JSON:
 
    ```text
@@ -33,6 +33,6 @@ On any failure (non-zero exit from a Shell command OR an `error` field in JSON o
 
 ## Message format (Conventional Commits)
 
-See `.claude/skills/pflow-commit/reference/commit-format.md` for the full format (types, scope, breaking-change rules, examples). In short: `<type>[(scope)][!]: <description>`, imperative mood.
+See `.agents/skills/pflow-commit/reference/commit-format.md` for the full format (types, scope, breaking-change rules, examples). In short: `<type>[(scope)][!]: <description>`, imperative mood.
 
 The commit message MUST always be written in English — regardless of the conversation language.

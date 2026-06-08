@@ -6,7 +6,7 @@
 # produce output or exit when sourced, so other skills (e.g. pflow-task-finish)
 # can `source` it to reuse the commit/push logic without side effects.
 #
-# Path derivation: this lib lives at .claude/skills/<skill>/scripts/git-lib.sh
+# Path derivation: this lib lives at .agents/skills/<skill>/scripts/git-lib.sh
 # once installed, so three levels up from SKILL_DIR is the consuming repo root.
 # Both pflow-commit and any sibling skill that sources this file resolve to the
 # same PFLOW_ROOT_DIR.
