@@ -33,6 +33,12 @@ On any failure (non-zero exit from a Shell command OR an `error` field in JSON o
 
 ## Message format (Conventional Commits)
 
-See `.agents/skills/pflow-commit/reference/commit-format.md` for the full format (types, scope, breaking-change rules, examples). In short: `<type>[(scope)][!]: <description>`, imperative mood.
+`<type>[(scope)][!]: <description>` plus an optional blank line, body, and footer(s).
 
-The commit message MUST always be written in English — regardless of the conversation language.
+- **Language: the entire message (description, body, and footers) MUST always be written in English — regardless of the conversation language — unless the user explicitly requests another language.**
+- Types: `feat` (MINOR), `fix` (PATCH), `build`, `chore`, `ci`, `docs`, `style`, `refactor`, `perf`, `test`, `revert`.
+- Breaking change: `!` in the header or a `BREAKING CHANGE: ...` footer (MAJOR).
+- `scope` — only when it adds value. Pick the narrowest correct type; split unrelated types into separate commits.
+- Description — short, in English, imperative mood ("add", not "added").
+
+Examples: `feat: add user page` · `fix(parser): handle empty input` · `feat!: remove legacy auth flow`

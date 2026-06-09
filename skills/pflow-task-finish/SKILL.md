@@ -11,7 +11,7 @@ On any failure (non-zero exit, or an `error` field / `"status":"error"` in the J
 
 ## Steps
 
-1. **Compose MESSAGE.** Run `.agents/skills/pflow-commit/scripts/git-commit-context.sh` (read-only) and write a Conventional Commit message for the diff (format: `.agents/skills/pflow-commit/reference/commit-format.md`). If it reports no changes — or is missing because `pflow-commit` isn't installed — use a minimal message like `chore: finish task <title>` (it's only used when there's something to commit). Optionally add a kebab-case SLUG; otherwise the script derives one from the task title.
+1. **Compose MESSAGE** (see format below). Run `.agents/skills/pflow-commit/scripts/git-commit-context.sh` (read-only) and write a Conventional Commit message for the diff. If the script reports no changes — or is missing because `pflow-commit` isn't installed — use a minimal message like `chore: finish task <title>`. Optionally add a kebab-case SLUG; otherwise the script derives one from the task title.
 2. **Run once:** `.agents/skills/pflow-task-finish/scripts/task-finish.sh --message "MESSAGE" [--slug "SLUG"] [--dev "BRANCH"]`. It prints one JSON line; act on `status`:
    - `no_current_task` — tell the user there's nothing to finish.
    - `closed_no_git` — task closed, git skipped; print the JSON `warning` so they install `pflow-commit`.
@@ -23,6 +23,18 @@ On any failure (non-zero exit, or an `error` field / `"status":"error"` in the J
    Commit: <commit_hash> (<commit_status>) | push task: <push_status_task> | push dev: <push_status_dev>
    Cleanup: local <delete_local_status> | remote <delete_remote_status>
    ```
+
+## Message format (Conventional Commits)
+
+`<type>[(scope)][!]: <description>` plus an optional blank line, body, and footer(s).
+
+- **Language: the entire message (description, body, and footers) MUST always be written in English — regardless of the conversation language — unless the user explicitly requests another language.**
+- Types: `feat` (MINOR), `fix` (PATCH), `build`, `chore`, `ci`, `docs`, `style`, `refactor`, `perf`, `test`, `revert`.
+- Breaking change: `!` in the header or a `BREAKING CHANGE: ...` footer (MAJOR).
+- `scope` — only when it adds value. Pick the narrowest correct type; split unrelated types into separate commits.
+- Description — short, in English, imperative mood ("add", not "added").
+
+Examples: `feat: add user page` · `fix(parser): handle empty input` · `feat!: remove legacy auth flow`
 
 ## Gotchas
 
