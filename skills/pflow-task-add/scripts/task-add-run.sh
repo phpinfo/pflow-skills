@@ -104,7 +104,7 @@ if [[ ! -f "$mdtodo_file" ]]; then
 	}
 fi
 
-cmd=(mdtodo add --file "$mdtodo_file")
+cmd=(mdtodo add --file "$mdtodo_file" --position last)
 [[ -n "$version" ]] && cmd+=(--version "$version")
 cmd+=("$title")
 
