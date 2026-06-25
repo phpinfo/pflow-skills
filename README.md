@@ -32,6 +32,7 @@ npx skills add phpinfo/pflow-skills -s pflow-commit
 | --- | --- |
 | [`pflow-commit`](skills/pflow-commit) | Analyzes your working tree, writes a [Conventional Commit](https://www.conventionalcommits.org/) message, then commits and pushes. Invoked manually. |
 | [`pflow-task-add`](skills/pflow-task-add) | Adds a new task to the `mdtodo` task list. The agent clarifies the task's essence, formulates a concise title and description with expected result, then adds it via `mdtodo`. Invoked manually. |
+| [`pflow-task-plan`](skills/pflow-task-plan) | Builds a concrete implementation plan for the current active `mdtodo` task. The agent clarifies open questions, analyzes the codebase and docs, decomposes the work into small steps, and saves the plan to a file. Plans only — does not implement. Invoked manually. |
 | [`pflow-task-next`](skills/pflow-task-next) | Takes the next `mdtodo` task into progress and creates a git branch named for it (`feature/`, `fix/`, `chore/`). Requires a clean working tree on the dev branch. Invoked manually. |
 | [`pflow-task-finish`](skills/pflow-task-finish) | Closes the current `mdtodo` task; when `pflow-commit` is installed, branches the work, commits it, and merges into `dev`. Degrades to mdtodo-only with a warning otherwise. Invoked manually. |
 | [`pflow-changelog`](skills/pflow-changelog) | Generates a [Keep a Changelog](https://keepachangelog.com/) entry for the current feature version based on completed tasks and git commits, prepends it to `CHANGELOG.md`, then commits and pushes. Requires a clean working tree on the dev branch. Invoked manually. |
@@ -85,6 +86,19 @@ Most skills work with zero configuration. `pflow-task-finish` accepts optional s
 | Variable | Default | Description |
 | --- | --- | --- |
 | `PFLOW_TASKS_MDTODO_FILE` | _(mdtodo's own default, `todo.md`)_ | Path to the Markdown todo list. Exported as `MDTODO_FILE` before any `mdtodo` call. |
+
+### `pflow-task-plan`
+
+**Requires:** `mdtodo` CLI.
+
+**Scripts:** `plan-context.sh` (resolves the tasks file and reads the active task), `plan-save.sh` (reads the plan Markdown from stdin and writes it to `PFLOW_TASKS_PLAN_FILENAME`).
+
+**Environment variables** (env or `.env`):
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `PFLOW_TASKS_MDTODO_FILE` | _(mdtodo's own default, `todo.md`)_ | Path to the Markdown todo list. Used to read the current active task. |
+| `PFLOW_TASKS_PLAN_FILENAME` | `./tmp/pflow-tasks-plan.md` | Path the generated plan is written to. Parent directories are created automatically. |
 
 ### `pflow-task-next`
 
