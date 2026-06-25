@@ -91,14 +91,14 @@ Most skills work with zero configuration. `pflow-task-finish` accepts optional s
 
 **Requires:** `mdtodo` CLI.
 
-**Scripts:** `plan-context.sh` (resolves the tasks file and reads the active task), `plan-save.sh` (reads the plan Markdown from stdin and writes it to `PFLOW_TASKS_PLAN_FILENAME`).
+**Scripts:** `plan-context.sh` (resolves the tasks file and reads the active task), `plan-save.sh` (reads the plan Markdown from stdin and writes it to `PFLOW_TASKS_PLAN_FILE`).
 
 **Environment variables** (env or `.env`):
 
 | Variable | Default | Description |
 | --- | --- | --- |
 | `PFLOW_TASKS_MDTODO_FILE` | _(mdtodo's own default, `todo.md`)_ | Path to the Markdown todo list. Used to read the current active task. |
-| `PFLOW_TASKS_PLAN_FILENAME` | `./tmp/pflow-tasks-plan.md` | Path the generated plan is written to. Parent directories are created automatically. |
+| `PFLOW_TASKS_PLAN_FILE` | `./tmp/pflow-tasks-plan.md` | Path the generated plan is written to. Parent directories are created automatically. |
 
 ### `pflow-task-next`
 

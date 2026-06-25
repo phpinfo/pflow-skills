@@ -49,7 +49,7 @@ cd "$ROOT_DIR" || { emit_error "chdir" 1 "cannot enter repo root: $ROOT_DIR"; ex
 
 load_dotenv "$ROOT_DIR/.env"
 
-plan_filename="${PFLOW_TASKS_PLAN_FILENAME:-./tmp/pflow-tasks-plan.md}"
+plan_filename="${PFLOW_TASKS_PLAN_FILE:-./tmp/pflow-tasks-plan.md}"
 
 content="$(cat)"
 
