@@ -2,6 +2,13 @@
 
 set -u
 
+allow_release_dirty=0
+for arg in "$@"; do
+	case "$arg" in
+		--allow-release-dirty) allow_release_dirty=1 ;;
+	esac
+done
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 ROOT_DIR="$(cd "$SKILL_DIR/../../.." && pwd)"
@@ -58,8 +65,10 @@ if ! command -v mdtodo >/dev/null 2>&1; then
 	emit_error "mdtodo" 11 "mdtodo CLI is not available"
 fi
 
-if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
-	emit_error "git status" 2 "working tree has uncommitted changes"
+if [[ "$allow_release_dirty" -ne 1 ]]; then
+	if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
+		emit_error "git status" 2 "working tree has uncommitted changes"
+	fi
 fi
 
 dev_branch="${PFLOW_GIT_DEV_BRANCH:-dev}"
