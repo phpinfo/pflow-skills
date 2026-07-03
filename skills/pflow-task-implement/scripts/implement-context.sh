@@ -78,7 +78,7 @@ if [[ -z "$current_task" ]]; then
 fi
 
 if [[ ! -f "$plan_file" ]]; then
-	emit_error "plan_file" 1 "plan file not found: $plan_file (run pflow-task-plan first)"; exit 1
+	emit_error "plan_file" 1 "plan file not found: $plan_file"; exit 1
 fi
 
 if [[ -z "$(tr -d '[:space:]' < "$plan_file")" ]]; then

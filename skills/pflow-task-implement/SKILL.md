@@ -13,17 +13,16 @@ If file editing is unavailable in the current mode, print `⚠️ Agent cannot w
 ## Steps
 
 1. **Context.** Run `.agents/skills/pflow-task-implement/scripts/implement-context.sh` → JSON `{status,current_task,plan_file}`. Implement only `current_task`.
-2. **Review.** Read `plan_file` and review it critically before doing anything. If a step is ambiguous, contradictory, or has a gap that blocks execution, stop and ask the user — never guess or fill in missing decisions.
-3. **Decompose.** Turn the plan into todo items with your todo tool — one item per plan step, in plan order. Create exactly the steps the plan lists; do not invent, merge, or skip steps.
-4. **Execute.** Work the todos one at a time: mark in_progress, implement the step following the plan exactly, then mark completed. Write code that is correct, readable, and free of duplication, matching the surrounding codebase.
-5. **Verify.** Run whatever verification the plan specifies for each step. If a step has no stated check, confirm by reading back the change. Stop and ask the user on any blocker (failed verification, missing dependency, unclear instruction) rather than working around it.
-6. **Confirm.** When all todos are done, walk every plan item to confirm it is covered, then reply in the **Format** below.
+2. **Review.** Read `plan_file` and review it critically. If a step is ambiguous, contradictory, or has a blocking gap, stop and ask the user — never guess.
+3. **Execute.** Implement each plan step in order, exactly as written. Write correct, readable, duplication-free code that matches the surrounding codebase.
+4. **Verify.** Run whatever check the plan specifies for each step; if none, confirm by reading back the change. Stop and ask the user on any blocker (failed verification, missing dependency, unclear step) rather than working around it.
+5. **Confirm.** When every plan step is done and covered, reply in the **Format** below.
 
 ## Gotchas
 
-- Implement the plan as written. If reality diverges from the plan, stop and surface it — do not silently improvise a different approach.
-- Do **not** commit, push, or close the task — those are separate skills (`pflow-commit`, `pflow-task-finish`). Leave the active task open.
-- Do not add work beyond the plan: no extra refactors, tests, or features the plan does not call for.
+- Implement the plan as written. If reality diverges, stop and surface it — do not silently improvise.
+- Do **not** commit, push, or close the task. Leave the active task open.
+- Add nothing beyond the plan: no extra refactors, tests, or features.
 
 ## Format
 
