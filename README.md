@@ -37,6 +37,7 @@ npx skills add phpinfo/pflow-skills -s pflow-commit
 | [`pflow-task-next`](skills/pflow-task-next) | Takes the next `mdtodo` task into progress and creates a git branch named for it (`feature/`, `fix/`, `chore/`). Requires a clean working tree on the dev branch. Invoked manually. |
 | [`pflow-task-finish`](skills/pflow-task-finish) | Closes the current `mdtodo` task; when `pflow-commit` is installed, branches the work, commits it, and merges into `dev`. Degrades to mdtodo-only with a warning otherwise. Invoked manually. |
 | [`pflow-changelog`](skills/pflow-changelog) | Generates a [Keep a Changelog](https://keepachangelog.com/) entry for the current feature version based on completed tasks and git commits, prepends it to `CHANGELOG.md`, then commits and pushes. Requires a clean working tree on the dev branch. Invoked manually. |
+| [`pflow-refactor`](skills/pflow-refactor) | Performs evidence-based refactoring research for a code, component, or subsystem. Produces an As Is analysis and a minimal, justified To Be proposal with naming, dependency, migration, and trade-off recommendations. Applies SOLID, KISS, YAGNI, DRY, Law of Demeter, and composition over inheritance. Analysis only — does not implement changes. Invoked manually. |
 
 ## Configuration
 
