@@ -38,6 +38,7 @@ npx skills add phpinfo/pflow-skills -s pflow-commit
 | [`pflow-task-finish`](skills/pflow-task-finish) | Closes the current `mdtodo` task; when `pflow-commit` is installed, branches the work, commits it, and merges into `dev`. Degrades to mdtodo-only with a warning otherwise. Invoked manually. |
 | [`pflow-changelog`](skills/pflow-changelog) | Generates a [Keep a Changelog](https://keepachangelog.com/) entry for the current feature version based on completed tasks and git commits, prepends it to `CHANGELOG.md`, then commits and pushes. Requires a clean working tree on the dev branch. Invoked manually. |
 | [`pflow-refactor`](skills/pflow-refactor) | Performs evidence-based refactoring research for a code, component, or subsystem. Produces an As Is analysis and a minimal, justified To Be proposal with naming, dependency, migration, and trade-off recommendations. Applies SOLID, KISS, YAGNI, DRY, Law of Demeter, and composition over inheritance. Analysis only — does not implement changes. Invoked manually. |
+| [`pflow-grill`](skills/pflow-grill) | Grills you relentlessly about a plan, decision, or idea until you reach a shared understanding. Maps the subject as a design tree and interviews in rounds — each round asks every question whose prerequisites are settled, with lettered answer options and a recommendation. Adapted from [mattpocock/skills `grilling`](https://github.com/mattpocock/skills/blob/main/skills/productivity/grilling/SKILL.md). Fires on "grill" trigger phrases. |
 
 ## Configuration
 
