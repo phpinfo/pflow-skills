@@ -13,6 +13,11 @@ license: MIT
 5. **Recompute.** Each round of answers reshapes the tree — settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round.
 6. **Close.** The session is done when the frontier is empty: every branch of the design tree visited, nothing left silently assumed. Do not act on the result until the user confirms you have reached a shared understanding.
 
+## Codex (ChatGPT)
+
+- Before grilling, ask the user to switch the app to Plan mode; do not start until they do.
+- After grilling and before writing a plan, use the user-input tool to offer switching back or continuing the plan in Plan mode. Wait for their choice.
+
 ## Format
 
 Let a native tool control presentation; do not duplicate its UI in plain text. For the plain-text fallback, render each question as:
