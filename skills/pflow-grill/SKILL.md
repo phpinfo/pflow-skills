@@ -1,6 +1,6 @@
 ---
 name: pflow-grill
-description: Grills the user relentlessly about a plan, decision, or idea until both sides reach a shared understanding. Maps the subject as a design tree and interviews in rounds — each round asks every question whose prerequisites are already settled, with lettered answer options and a recommended answer, then waits. Use when the user wants to stress-test their thinking, pressure-test a plan or a design, or uses a "grill" trigger phrase.
+description: Grills the user relentlessly about a plan, decision, or idea until both sides reach a shared understanding. Maps the subject as a design tree and interviews in rounds — each round asks every question whose prerequisites are already settled, with answer options and a recommended answer, then waits. Use when the user wants to stress-test their thinking, pressure-test a plan or a design, or uses a "grill" trigger phrase.
 license: MIT
 ---
 
@@ -8,14 +8,14 @@ license: MIT
 
 1. **Map.** Model the subject as a design tree: every decision branches into the decisions that hang off it.
 2. **Frontier.** The frontier is every decision whose prerequisites are already settled — the questions you can ask _now_ without guessing at answers you have not heard yet. A question whose answer depends on another question still open belongs to a _later_ round, not this one.
-3. **Ask.** Put the whole frontier to the user in one round, numbered, each in the format below with your recommended answer. Write every question so it clicks on first read — see Voice. Use the user-input tool provided by the current harness to collect the user's answers; do not ask the round in a plain-text assistant message and wait for a reply. If the frontier exceeds the tool's per-call limit, make multiple tool calls for the same round before recomputing it.
+3. **Ask.** Put the whole frontier to the user in one round, numbered, with your recommended answers. Write every question so it clicks on first read — see Voice. Use the harness's native user-input tool when callable in the active mode; otherwise use the plain-text format below if permitted. If neither is allowed, explain the limitation and offer supported recovery, such as switching modes or continuing without Grill. Adapt to the native tool's schema; never infer callability from its name, invent a tool call, or violate the active mode. If the frontier exceeds its per-call limit, split the same round across calls before recomputing.
 4. **Research.** Finding _facts_ is your job, never the user's. When a frontier question needs a fact from the environment (filesystem, tools, docs), dispatch a sub-agent to find it. Do not block on it: a running exploration is an unsettled prerequisite, so only the questions downstream of it wait for the report — ask the rest of the frontier now. The _decisions_ are the user's; put each to them and wait.
 5. **Recompute.** Each round of answers reshapes the tree — settled decisions push the frontier outward and unblock questions that depended on them. Recompute the frontier and ask the next round.
 6. **Close.** The session is done when the frontier is empty: every branch of the design tree visited, nothing left silently assumed. Do not act on the result until the user confirms you have reached a shared understanding.
 
 ## Format
 
-Each question:
+Let a native tool control presentation; do not duplicate its UI in plain text. For the plain-text fallback, render each question as:
 
 ```
 ❓ **Q1** - **<question title>**: <question body, may span multiple short paragraphs>
@@ -38,7 +38,7 @@ The reader is a smart friend who does not already live in this codebase. Goal: i
 - **Lead with the point.** The first sentence is the one thing that matters. Then supporting detail.
 - **One idea per sentence.** No telegraphic colon-chains. If two things got mixed, split them into labeled parts, then recap in one line.
 - **Facts stay verbatim.** Names, paths, commands, env vars, IDs are never paraphrased. Explain around them. When a term is jargon, say what it means in the same breath.
-- **Title is a plain phrase**, not a compressed label. The body ends with the actual decision in one sentence, then the lettered options.
+- **Title is a plain phrase**, not a compressed label. The body ends with the actual decision in one sentence. In the plain-text fallback, the lettered options follow it.
 - **Same language as the user.** Direct, not consultant-speak, not memes.
 
 ## Boundaries
