@@ -54,6 +54,11 @@ if [[ -z "$branch_name" || "$branch_name" == "HEAD" ]]; then
 	exit 11
 fi
 
+if ! git_preflight; then
+	print_json_error "$GIT_ERR_STEP" "$GIT_ERR_CODE" "$branch_name" "" "not_pushed" "$GIT_ERR_MSG"
+	exit "$GIT_ERR_CODE"
+fi
+
 if ! git_commit_all "$commit_message"; then
 	print_json_error "$GIT_ERR_STEP" "$GIT_ERR_CODE" "$branch_name" "" "not_pushed" "$GIT_ERR_MSG"
 	exit "$GIT_ERR_CODE"

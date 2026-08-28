@@ -13,7 +13,7 @@ On any failure (non-zero exit from a Shell command OR an `error` field in JSON o
 
 1. Get the context: `.agents/skills/pflow-commit/scripts/git-commit-context.sh`. If the output is `No changes detected.`, tell the user there is nothing to commit and stop.
 2. Compose MESSAGE (see format below) using ONLY the step-1 output — no other sources.
-3. Commit and push: `.agents/skills/pflow-commit/scripts/git-commit-push.sh --message "MESSAGE"`. The script prints JSON: `{commit_hash, branch_name, push_status}` on success, or `{…, error:{step, message}}` on failure. If `error` is present, print `⚠️ <error.message>` and stop.
+3. **Run the commit command in escalated execution mode from the start** (for `.git` write access): `.agents/skills/pflow-commit/scripts/git-commit-push.sh --message "MESSAGE"`. The script prints JSON: `{commit_hash, branch_name, push_status}` on success, or `{…, error:{step, message}}` on failure. If `error` is present, print `⚠️ <error.message>` and stop.
 4. Reply exactly, substituting values from the JSON:
 
    ```text
@@ -27,6 +27,7 @@ On any failure (non-zero exit from a Shell command OR an `error` field in JSON o
 ## Gotchas
 
 - `git-commit-push.sh` runs `git add -A` — the commit includes ALL working-tree changes, not just the ones your message describes. Account for this when composing the text.
+- The script now prechecks `.git` write access and stale `index.lock`; if it fails, rerun in escalated execution context.
 - **The step-1 output is the ONLY input.** Do not enrich or verify it: no reading files, no `git` commands, no grep/search, no conversation history, no sub-agents. If the context is incomplete or truncated, write the message from what it does contain — describe only what is visible and stay generic about the rest. Never ask the user for more context.
 - The context from step 1 is truncated: at most 50 lines per file and 600 lines total. Large diffs are shown only partially — don't draw conclusions about the cut-off part.
 - `push_status`: `pushed` (upstream already existed) or `pushed_with_upstream` (created via `git push -u origin <branch>`).

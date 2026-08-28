@@ -14,6 +14,7 @@
 PFLOW_LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PFLOW_SKILL_DIR="$(cd "$PFLOW_LIB_DIR/.." && pwd)"
 PFLOW_ROOT_DIR="$(cd "$PFLOW_SKILL_DIR/../../.." && pwd)"
+PFLOW_GIT_DIR="$PFLOW_ROOT_DIR/.git"
 
 # Outputs set by the functions below (read by callers after invocation):
 #   GIT_COMMIT_HASH        — commit sha on success
@@ -26,6 +27,38 @@ GIT_PUSH_STATUS=""
 GIT_ERR_STEP=""
 GIT_ERR_CODE=0
 GIT_ERR_MSG=""
+
+# git_preflight
+#   Validates git workspace writeability and index.lock state before staging.
+#   Returns non-zero and sets GIT_ERR_* on failure.
+git_preflight() {
+	local index_lock_path="${PFLOW_GIT_DIR}/index.lock"
+	local write_probe_path="${PFLOW_GIT_DIR}/.pflow-write-probe"
+
+	if [[ ! -d "$PFLOW_GIT_DIR" ]]; then
+		GIT_ERR_STEP="git preflight"
+		GIT_ERR_CODE=2
+		GIT_ERR_MSG="git directory not found at ${PFLOW_GIT_DIR}; is this a git repository?"
+		return 2
+	fi
+
+	if [[ -f "$index_lock_path" ]]; then
+		GIT_ERR_STEP="git preflight"
+		GIT_ERR_CODE=2
+		GIT_ERR_MSG="stale git index lock exists at ${index_lock_path}; remove it only if no other git process is running"
+		return 2
+	fi
+
+	if ! (set -o noclobber; : > "$write_probe_path") 2>/dev/null; then
+		GIT_ERR_STEP="git preflight"
+		GIT_ERR_CODE=2
+		GIT_ERR_MSG="unable to create temporary file in ${PFLOW_GIT_DIR}; write escalation is required for commit/push"
+		return 2
+	fi
+
+	rm -f "$write_probe_path"
+	return 0
+}
 
 json_escape() {
 	local value="$1"
