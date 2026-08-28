@@ -15,7 +15,7 @@ license: MIT
 
 ## Codex (ChatGPT)
 
-- Before grilling, ask the user to switch the app to Plan mode; do not start until they do.
+- Before grilling, ask the user to switch the app to Plan mode; do not start until they do. Then begin grilling with `request_user_input`.
 - After grilling and before writing a plan, use the user-input tool to offer switching back or continuing the plan in Plan mode. Wait for their choice.
 
 ## Format
