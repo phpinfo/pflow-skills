@@ -6,7 +6,7 @@ allowed-tools:
   - Bash(.agents/skills/pflow-task-implement/scripts/implement-context.sh:*)
 ---
 
-On any failure (non-zero exit, or `"status":"error"` in the JSON) print `⚠️ <error.message>` and stop.
+If `implement-context.sh` fails (non-zero exit or `"status":"error"` in its JSON) print `⚠️ <error.message>` and stop.
 
 If file editing is unavailable in the current mode, print `⚠️ Agent cannot write files in this mode. Switch to a mode with write access.` and stop.
 

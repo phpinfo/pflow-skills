@@ -7,7 +7,7 @@ allowed-tools:
   - Bash(.agents/skills/pflow-task-plan/scripts/plan-save.sh:*)
 ---
 
-On failure (non-zero exit, or `"status":"error"` in the JSON): if the message is `empty plan content on stdin`, retry the save **exactly once** with a proper quoted-heredoc call. On a repeated error — or any other error — print `⚠️ <error.message>` and stop. Never retry endlessly.
+If a skill script fails (non-zero exit or `"status":"error"` in its JSON): if the message is `empty plan content on stdin`, retry the save **exactly once** with a proper quoted-heredoc call. On a repeated error — or any other error — print `⚠️ <error.message>` and stop. Never retry endlessly.
 
 If file editing is unavailable in the current mode, print `⚠️ Agent cannot write files in this mode. Switch to a mode with write access.` and stop.
 

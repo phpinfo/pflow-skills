@@ -40,7 +40,7 @@ allowed-tools:
 
 ### SKILL.md body (in order)
 
-1. Error handling: `On any failure (non-zero exit, or an \`error\` field / \`"status":"error"\` in the JSON) print \`⚠️ <message>\` and stop.`
+1. Error handling, scoped to the skill's scripts: `If \`<script>\` fails (non-zero exit or \`"status":"error"\` in its JSON) print \`⚠️ <error.message>\` and stop.` If later steps run project commands, add: `Other failing commands are findings — report and continue.`
 2. **Steps** — numbered, mixing script calls and agent decisions.
 3. **Gotchas** (optional) — only facts affecting agent behavior.
 4. **Format** (optional) — only when agent must produce structured output.

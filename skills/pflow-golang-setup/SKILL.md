@@ -6,7 +6,7 @@ allowed-tools:
   - Bash(.agents/skills/pflow-golang-setup/scripts/setup-context.sh)
 ---
 
-On any failure (non-zero exit, or an `error` field / `"status":"error"` in the JSON) print `⚠️ <message>` and stop.
+If `setup-context.sh` fails (non-zero exit or `"status":"error"` in its JSON) print `⚠️ <error.message>` and stop. Other failing commands are findings — report and continue.
 
 ## Steps
 
