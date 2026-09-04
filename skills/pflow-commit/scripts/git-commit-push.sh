@@ -77,5 +77,6 @@ if ! git_push_current; then
 fi
 
 escaped_branch="$(json_escape "$branch_name")"
-printf '{"commit_hash":"%s","branch_name":"%s","push_status":"%s"}\n' \
-	"$commit_hash" "$escaped_branch" "$GIT_PUSH_STATUS"
+escaped_message="$(json_escape "$GIT_COMMIT_SUBJECT")"
+printf '{"commit_hash":"%s","branch_name":"%s","push_status":"%s","message":"%s"}\n' \
+	"$commit_hash" "$escaped_branch" "$GIT_PUSH_STATUS" "$escaped_message"

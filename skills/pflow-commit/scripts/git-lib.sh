@@ -18,10 +18,12 @@ PFLOW_GIT_DIR="$PFLOW_ROOT_DIR/.git"
 
 # Outputs set by the functions below (read by callers after invocation):
 #   GIT_COMMIT_HASH        — commit sha on success
+#   GIT_COMMIT_SUBJECT     — the one-line message that was actually committed
 #   GIT_NOTHING_TO_COMMIT  — 1 when the working tree had nothing staged
 #   GIT_PUSH_STATUS        — pushed | pushed_with_upstream | failed
 #   GIT_ERR_STEP / GIT_ERR_CODE / GIT_ERR_MSG — populated on failure
 GIT_COMMIT_HASH=""
+GIT_COMMIT_SUBJECT=""
 GIT_NOTHING_TO_COMMIT=0
 GIT_PUSH_STATUS=""
 GIT_ERR_STEP=""
@@ -95,15 +97,44 @@ print_json_error() {
 	fi
 }
 
+# git_commit_subject <message>
+#   Prints the commit subject: the first non-blank line of <message>, trimmed.
+#   Everything after it — body, footers, trailers such as Co-Authored-By — is
+#   dropped, so every pflow commit is exactly one line. Returns 1 when the
+#   message has no non-blank line.
+git_commit_subject() {
+	local message="${1//$'\r'/}"
+	local line
+	while IFS= read -r line || [[ -n "$line" ]]; do
+		line="${line#"${line%%[![:space:]]*}"}"
+		line="${line%"${line##*[![:space:]]}"}"
+		if [[ -n "$line" ]]; then
+			printf '%s' "$line"
+			return 0
+		fi
+	done <<< "$message"
+	return 1
+}
+
 # git_commit_all <message>
-#   Stages everything and commits. Sets GIT_COMMIT_HASH on success.
+#   Stages everything and commits <message> reduced to its subject line (see
+#   git_commit_subject). Sets GIT_COMMIT_HASH and GIT_COMMIT_SUBJECT on success.
 #   If nothing is staged, sets GIT_NOTHING_TO_COMMIT=1 and returns 0 WITHOUT
 #   committing (callers decide whether that is fatal). On a real git failure,
 #   sets GIT_ERR_* and returns the failing exit code.
 git_commit_all() {
 	local message="$1"
 	GIT_COMMIT_HASH=""
+	GIT_COMMIT_SUBJECT=""
 	GIT_NOTHING_TO_COMMIT=0
+
+	local subject
+	if ! subject="$(git_commit_subject "$message")"; then
+		GIT_ERR_STEP="git commit"
+		GIT_ERR_CODE=1
+		GIT_ERR_MSG="commit message is empty"
+		return 1
+	fi
 
 	local add_output add_exit_code
 	add_output="$(git add -A 2>&1)"
@@ -121,7 +152,7 @@ git_commit_all() {
 	fi
 
 	local commit_output commit_exit_code
-	commit_output="$(git commit -m "$message" 2>&1)"
+	commit_output="$(git commit -m "$subject" 2>&1)"
 	commit_exit_code=$?
 	if [[ "$commit_exit_code" -ne 0 ]]; then
 		GIT_ERR_STEP="git commit"
@@ -131,6 +162,7 @@ git_commit_all() {
 	fi
 
 	GIT_COMMIT_HASH="$(git rev-parse HEAD)"
+	GIT_COMMIT_SUBJECT="$subject"
 	return 0
 }
 

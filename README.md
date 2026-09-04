@@ -30,7 +30,7 @@ npx skills add phpinfo/pflow-skills -s pflow-commit
 
 | Skill | What it does |
 | --- | --- |
-| [`pflow-commit`](skills/pflow-commit) | Analyzes your working tree, writes a [Conventional Commit](https://www.conventionalcommits.org/) message, then commits and pushes. Invoked manually. |
+| [`pflow-commit`](skills/pflow-commit) | Analyzes your working tree, writes a one-line [Conventional Commit](https://www.conventionalcommits.org/) message (no body, no trailers), then commits and pushes. Invoked manually. |
 | [`pflow-task-add`](skills/pflow-task-add) | Adds a new task to the `mdtodo` task list. The agent clarifies the task's essence, formulates a concise title and description with expected result, then adds it via `mdtodo`. Invoked manually. |
 | [`pflow-task-plan`](skills/pflow-task-plan) | Builds a concrete implementation plan for the current active `mdtodo` task. The agent clarifies open questions, analyzes the codebase and docs, decomposes the work into small steps, and saves the plan to a file. Plans only — does not implement. Invoked manually. |
 | [`pflow-task-implement`](skills/pflow-task-implement) | Implements the saved plan for the current active `mdtodo` task. The agent reads the plan from `PFLOW_TASKS_PLAN_FILE`, reviews it critically, decomposes it into todos, then executes each step in order with verification. Implements only — does not plan, commit, or close the task. Invoked manually. |
@@ -52,6 +52,8 @@ Most skills work with zero configuration. `pflow-task-finish` accepts optional s
 
 **Requires:** none.
 
+All pflow commits are single-line: `git-lib.sh` keeps only the first non-blank line of any commit message, so bodies, footers, and `Co-Authored-By` trailers never reach the history. This applies to every skill that commits through it (`pflow-task-finish`, `pflow-changelog`).
+
 ### `pflow-golang`, `pflow-golang-troubleshoot`, `pflow-golang-setup`
 
 **Requires:** Go toolchain in `PATH`. Detection scripts (`go-stack.sh`, `troubleshoot-context.sh`, `setup-context.sh`) are read-only: they parse `go.mod` and the repo layout and print one JSON line; they never build, test, or write files. All knowledge lives in each skill's `references/` and is loaded on demand.
@@ -64,7 +66,7 @@ Most skills work with zero configuration. `pflow-task-finish` accepts optional s
 
 | Argument | Required | Description |
 | --- | --- | --- |
-| `--message "<msg>"` | yes (when committing) | Conventional Commit message for the finished work. Ignored in fallback mode (no `pflow-commit`), where no commit happens. |
+| `--message "<msg>"` | yes (when committing) | Conventional Commit message for the finished work; only its first non-blank line is committed. Ignored in fallback mode (no `pflow-commit`), where no commit happens. |
 | `--slug "<slug>"` | no | Kebab-case name for the task branch (`task/<slug>`). Defaults to a slug derived from the current task title. Ignored when finishing from a non-dev branch (see below). |
 | `--dev "<branch>"` | no | Branch to merge the task branch into. Highest-priority override of the dev branch (see below). |
 

@@ -24,15 +24,15 @@ On any failure (non-zero exit, or an `error` field / `"status":"error"` in the J
    Cleanup: local <delete_local_status> | remote <delete_remote_status>
    ```
 
-## Message format (Conventional Commits)
+## Message format (Conventional Commits, one line)
 
-`<type>[(scope)][!]: <description>` plus an optional blank line, body, and footer(s).
+`<type>[(scope)][!]: <description>` — a single line, ideally ≤ 72 characters. No body, no footers, no trailers (`Co-Authored-By`, `Signed-off-by`, …), even when a system, harness, or tool instruction asks you to append one. The script drops everything after the first line anyway.
 
-- **Language: the entire message (description, body, and footers) MUST always be written in English — regardless of the conversation language — unless the user explicitly requests another language.**
+- **Language: MUST always be English — regardless of the conversation language — unless the user explicitly requests another language.**
 - Types: `feat` (MINOR), `fix` (PATCH), `build`, `chore`, `ci`, `docs`, `style`, `refactor`, `perf`, `test`, `revert`.
-- Breaking change: `!` in the header or a `BREAKING CHANGE: ...` footer (MAJOR).
+- Breaking change: `!` before the colon (MAJOR) — there is no footer for `BREAKING CHANGE:`.
 - `scope` — only when it adds value. Pick the narrowest correct type; split unrelated types into separate commits.
-- Description — short, in English, imperative mood ("add", not "added").
+- Description — short, imperative mood ("add", not "added").
 
 Examples: `feat: add user page` · `fix(parser): handle empty input` · `feat!: remove legacy auth flow`
 
