@@ -1,6 +1,6 @@
 ---
 name: pflow-glossary
-description: Creates or extends the project glossary — a single table of canonical terms, their code identifiers, one-sentence definitions and banned synonyms — so docs, code and conversation use one name per concept. Audits existing docs and identifier frequencies to find synonym clusters, asks the user which name is canonical, writes GLOSSARY.md in a fixed table format and adds a one-line rule to AGENTS.md/CLAUDE.md. Use when asked to create, update, or add terms to a glossary, fix naming synonyms, or define the project's ubiquitous language. Invoked manually only.
+description: Creates or extends GLOSSARY.md — one table of canonical terms, code identifiers, one-sentence definitions and banned synonyms. Use when a glossary is created, updated or audited, when a new domain term or a naming synonym appears, or when the user asks to define project terms.
 license: MIT
 allowed-tools:
   - Bash(.agents/skills/pflow-glossary/scripts/glossary-context.sh:*)
