@@ -36,3 +36,4 @@ Paths are relative to this skill: `.agents/skills/pflow-golang/references/`.
 - Make the zero value useful; no `init()`, no package-level mutable state.
 - Follow the project's conventions (AGENTS.md, existing packages) over these rules when they conflict — and say so.
 - Prefer stdlib (`slices`, `maps`, `cmp`, `log/slog`, `errors`) over a dependency that does the same.
+- Developer-facing text is English whatever language the conversation is in: comments, doc comments, identifiers, error and log messages. User-facing text (UI strings, notifications, localized content) keeps the product's language.

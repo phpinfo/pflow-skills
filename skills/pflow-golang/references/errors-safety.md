@@ -4,12 +4,16 @@
 
 - Sentinels for conditions callers branch on: `var ErrNotFound = errors.New("user not found")`. Compare with `errors.Is`, never `==` after wrapping.
 - Custom types when callers need data: `type ValidationError struct{ Field string }` with `Error() string`. Return pointer receivers consistently. Extract with `errors.As(err, &target)`; Go 1.26+: `errors.AsType[*ValidationError](err)`.
-- `fmt.Errorf` for one-off messages. Message: lowercase, no trailing punctuation, no "error:"/"failed to" prefixes — the caller adds context.
+- `fmt.Errorf` for one-off messages.
+- Message text: lowercase, no trailing punctuation, no `error:`/`failed to` prefixes, no package prefix (`"user not found"`, not `"store: user not found"`) — the caller adds context.
 - Never return `nil, nil`. Never use in-band values (`-1`, `""`) instead of an error or `(v, ok)`.
 
 ## Wrapping and handling
 
-- Add context at each layer once, in the caller's vocabulary: `fmt.Errorf("load config %q: %w", path, err)`. Don't repeat what the callee already said.
+- Add context at each layer once, in the caller's vocabulary. Don't repeat what the callee already said. Template — what happened, then `key=value` pairs separated by `; `, then the cause last:
+  ```go
+  fmt.Errorf("load config: path=%s; env=%s: %w", path, env, err)
+  ```
 - `%w` when the caller may inspect the cause; `%v` when you deliberately hide implementation details at an API boundary. Document which sentinels you re-expose.
 - Handle an error exactly once: log **or** return, never both. Logging and re-returning double-reports.
 - `errors.Join(errs...)` to aggregate independent failures (validation, cleanup). `errors.Is` sees through joins.

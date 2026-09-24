@@ -11,7 +11,7 @@ Priority order when rules collide: clarity > simplicity > concision > maintainab
 - Getters have no `Get`: `u.Name()`, setter `u.SetName()`. Booleans read as predicates: `isReady`, `hasNext`, `IsValid()`.
 - One-method interfaces end in `-er`: `Reader`, `Closer`, `Validator`. Avoid `I`-prefix and `Interface`/`Impl` suffixes.
 - Constructors: `New()` when the package has one main type, `NewClient()` otherwise. Return the concrete type.
-- Errors: variables `ErrNotFound`, types `NotFoundError`. Messages lowercase, no trailing punctuation, no "failed to" chains.
+- Errors: variables `ErrNotFound`, types `NotFoundError`. Message format: see `errors-safety.md`.
 - Receivers: 1–2 letters, consistent across all methods of the type (`c *Client` everywhere), never `this`/`self`.
 - Enums start at 1 (`iota + 1`) unless zero is a meaningful default; type them: `type Level int`.
 - Test names: `TestType_Method_case`; subtests `"empty input"`, `"nil receiver"` — readable, no underscores needed.
