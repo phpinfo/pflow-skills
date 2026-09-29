@@ -1,6 +1,6 @@
 ---
 name: pflow-backlog
-description: Manages docs/backlog: adds a task as a numbered Markdown file (<NNN>-<slug>.md) or deletes it when done or moved into a spec. Fires on "добавь в бэклог" / "add to backlog" or when a fix is deferred.
+description: 'Manages docs/backlog: adds a task as a numbered Markdown file (<NNN>-<slug>.md) or deletes it when done or moved into a spec. Fires on "добавь в бэклог" / "add to backlog" or when a fix is deferred.'
 license: MIT
 allowed-tools:
   - Bash(.agents/skills/pflow-backlog/scripts/backlog-add.sh:*)
