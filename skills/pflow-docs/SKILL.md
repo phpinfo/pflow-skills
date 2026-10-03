@@ -9,7 +9,7 @@ User docs are `README*` at any level, everything under `docs/`, and root-level M
 ## Steps
 
 1. Read `AGENTS.md`/`CLAUDE.md` for doc conventions, and the glossary if any (`GLOSSARY.md`, `Глоссарий.md` or similar; often absent). Project conventions win; say so on conflict.
-2. Take the language from the document or the project's other docs. For Russian, also read `.agents/skills/pflow-docs/references/ru.md`.
+2. Take the language from the document or the project's other docs. For Russian, also read `.agents/skills/pflow-docs/references/ru.md` and write about 80% in УТР style (ГОСТ Р 58049-2017): clear, short and unambiguous, without overly formal language. When unsure how to phrase or format something, check `.agents/skills/pflow-docs/references/ru-utr.md`.
 3. Check every command, flag, path and name against the code, manifests or the user. Never fill a gap with a guess: ask or leave it out.
 4. Apply the rules below only to text you write or change. Report other violations; rewrite them only when asked.
 5. Before finishing, confirm no fact was lost or added, and search for the tells that survive rewrites: "not X but Y", a restating closer, a run-up, a reflex triad, bold labels. Run documented commands that are safe to run; a failure is a finding, not a stop.

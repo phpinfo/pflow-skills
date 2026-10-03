@@ -5,6 +5,7 @@ Adds to `SKILL.md` what is specific to Russian.
 - Write in Russian, not a calque of English; if a sentence sounds translated, rewrite it. Simple links: «есть», «нужен», «ходит», «отдаёт».
 - English only for names from code or protocols, in backticks (`GetPayment`). Replace English jargon in a Russian sentence («conditional update», «победитель») with what happens: «обновить с проверкой текущего статуса».
 - Exception: established terms from the project glossary («поллинг»), written as there. The glossary may be missing or named differently; without one, prefer the Russian description.
+- A step starts with the verb in imperative plural, one action per sentence: «Запустите `make build`.», not «Запусти» or «Необходимо запустить».
 - Quotes are «ёлочки».
 - A dash between subject and predicate is grammar («Моби — наша ПС»), not a tell; one sentence still must not rest on several dashes.
 
