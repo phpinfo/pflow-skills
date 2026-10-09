@@ -119,8 +119,18 @@ if [[ "$tasks_exit" -ne 0 ]]; then
 	tasks_json="[]"
 fi
 
+# Release branch the feature commits are counted from.
+# Precedence: $PFLOW_GIT_MAIN_BRANCH (env/.env) > autodetected main/master > "master".
+if [[ -n "${PFLOW_GIT_MAIN_BRANCH:-}" ]]; then
+	main_branch="$PFLOW_GIT_MAIN_BRANCH"
+elif git show-ref --verify --quiet refs/heads/main && ! git show-ref --verify --quiet refs/heads/master; then
+	main_branch="main"
+else
+	main_branch="master"
+fi
+
 set +e
-git_log="$(git --no-pager log --no-merges --reverse --pretty=format:'- %s%n%b' master..HEAD 2>/dev/null)"
+git_log="$(git --no-pager log --no-merges --reverse --pretty=format:'- %s%n%b' "$main_branch..HEAD" 2>/dev/null)"
 log_exit=$?
 set -e
 

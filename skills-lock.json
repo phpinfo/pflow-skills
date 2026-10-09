@@ -5,19 +5,19 @@
       "source": "phpinfo/pflow-skills",
       "sourceType": "github",
       "skillPath": "skills/pflow-commit/SKILL.md",
-      "computedHash": "07cd9dded0a5d9f00d964444adaf2a3f503496b858089f291b980987e77b7e69"
+      "computedHash": "ac66c964fb6e9f167e72656679cda7bfce53a7670889914a312a82e5738f81e1"
     },
     "pflow-docs": {
       "source": "phpinfo/pflow-skills",
       "sourceType": "github",
       "skillPath": "skills/pflow-docs/SKILL.md",
-      "computedHash": "0b6a977e17f2a10d3ecb5fec5fe10899d965f648161c6896e8e04daa79b798e4"
+      "computedHash": "e8fedb5e70f072269dd952bb0279c5b3df46d1e013e7d01213331b3f02c66438"
     },
     "pflow-skill": {
       "source": "phpinfo/pflow-skills",
       "sourceType": "github",
       "skillPath": "skills/pflow-skill/SKILL.md",
-      "computedHash": "ad0c9b4117f08974067c422821be003d6e3dba36da09bd875902491d1dfab0ab"
+      "computedHash": "389ce9217974215cf08020bcf6c222f210f66ec5e51b7cc56020d1c4d19f58d5"
     }
   }
 }
