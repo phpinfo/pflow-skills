@@ -15,7 +15,8 @@ json_escape() {
 	printf '%s' "$v"
 }
 emit_error() {
-	printf '{"status":"error","error":{"step":"%s","exit_code":%d,"message":"%s"}}\n' "$(json_escape "$1")" "$2" "$(json_escape "$3")"
+	printf '{"status":"error","error":{"step":"%s","exit_code":%d,"message":"%s"}}\n' \
+		"$(json_escape "$1")" "$2" "$(json_escape "$3")"
 }
 
 overwrite=0; claude_mode="copy"; max_lines=100; warn_lines=60
@@ -25,12 +26,19 @@ while [[ $# -gt 0 ]]; do
 		--claude) claude_mode="${2:-}"; shift 2 ;;
 		--max-lines) max_lines="${2:-}"; shift 2 ;;
 		--warn-lines) warn_lines="${2:-}"; shift 2 ;;
-		-h|--help) emit_error "usage" 1 "Usage: agents-finalize.sh [--overwrite] [--claude copy|import|none] [--max-lines N] [--warn-lines N] < AGENTS.md"; exit 1 ;;
+		-h|--help)
+			emit_error "usage" 1 \
+				"Usage: agents-finalize.sh [--overwrite] [--claude copy|import|none] [--max-lines N] [--warn-lines N] < AGENTS.md"
+			exit 1 ;;
 		*) emit_error "usage" 1 "Unknown argument: $1"; exit 1 ;;
 	esac
 done
-case "$claude_mode" in copy|import|none) ;; *) emit_error "usage" 1 "--claude must be copy, import or none"; exit 1 ;; esac
-[[ "$max_lines" =~ ^[0-9]+$ && "$warn_lines" =~ ^[0-9]+$ ]] || { emit_error "usage" 1 "--max-lines/--warn-lines must be integers"; exit 1; }
+case "$claude_mode" in
+	copy|import|none) ;;
+	*) emit_error "usage" 1 "--claude must be copy, import or none"; exit 1 ;;
+esac
+[[ "$max_lines" =~ ^[0-9]+$ && "$warn_lines" =~ ^[0-9]+$ ]] \
+	|| { emit_error "usage" 1 "--max-lines/--warn-lines must be integers"; exit 1; }
 
 [[ -t 0 ]] && { emit_error "stdin" 1 "no content on stdin — pipe the AGENTS.md Markdown via a quoted heredoc"; exit 1; }
 content="$(cat)"
@@ -42,11 +50,22 @@ cd "$ROOT_DIR" || { emit_error "chdir" 1 "cannot enter project root: $ROOT_DIR";
 # --- hard checks (block the write) -------------------------------------------
 lines="$(printf '%s' "$content" | wc -l | tr -d ' ')"
 bytes="$(printf '%s' "$content" | wc -c | tr -d ' ')"
-(( lines > max_lines )) && { emit_error "lint" 1 "AGENTS.md is $lines lines; limit is $max_lines. Cut derivable, duplicated or generic lines, or move detail into referenced files."; exit 1; }
-(( bytes > 32768 )) && { emit_error "lint" 1 "AGENTS.md is $bytes bytes; Codex stops reading at 32768. Trim it."; exit 1; }
+if (( lines > max_lines )); then
+	msg="AGENTS.md is $lines lines; limit is $max_lines."
+	emit_error "lint" 1 "$msg Cut derivable, duplicated or generic lines, or move detail into referenced files."
+	exit 1
+fi
+if (( bytes > 32768 )); then
+	emit_error "lint" 1 "AGENTS.md is $bytes bytes; Codex stops reading at 32768. Trim it."; exit 1
+fi
 if (( ! overwrite )); then
-	[[ -f AGENTS.md ]] && { emit_error "exists" 1 "AGENTS.md already exists — read it, merge, then rerun with --overwrite"; exit 1; }
-	[[ -e CLAUDE.md && "$claude_mode" != "none" ]] && { emit_error "exists" 1 "CLAUDE.md already exists — read it, merge, then rerun with --overwrite (or --claude none)"; exit 1; }
+	if [[ -f AGENTS.md ]]; then
+		emit_error "exists" 1 "AGENTS.md already exists — read it, merge, then rerun with --overwrite"; exit 1
+	fi
+	if [[ -e CLAUDE.md && "$claude_mode" != "none" ]]; then
+		emit_error "exists" 1 "CLAUDE.md already exists — read it, merge, then rerun with --overwrite (or --claude none)"
+		exit 1
+	fi
 fi
 
 # --- soft checks (warnings) --------------------------------------------------
@@ -54,36 +73,56 @@ warnings=""
 add_warning() { # code line text
 	warnings+="${warnings:+,}{\"code\":\"$(json_escape "$1")\",\"line\":$2,\"text\":\"$(json_escape "$3")\"}"
 }
-(( lines > warn_lines )) && add_warning "long" 0 "$lines lines; target is <= $warn_lines. Re-apply the removal test to every line."
+(( lines > warn_lines )) && add_warning "long" 0 \
+	"$lines lines; target is <= $warn_lines. Re-apply the removal test to every line."
 
-filler='write clean code|follow best practices|be careful|be thorough|high[- ]quality|well[- ]tested|maintainable|readable code|clean architecture|solid principles|dry principle|kiss principle|as needed|where appropriate|when necessary|good practices|industry standard|self-explanatory|this project (is|uses)|you are an? (expert|senior|helpful)|always write tests|handle errors properly|meaningful (names|variable)|add comments|use descriptive'
+filler='write clean code|follow best practices|be careful|be thorough|high[- ]quality|well[- ]tested|maintainable'
+filler+='|readable code|clean architecture|solid principles|dry principle|kiss principle|as needed|where appropriate'
+filler+='|when necessary|good practices|industry standard|self-explanatory|this project (is|uses)'
+filler+='|you are an? (expert|senior|helpful)|always write tests|handle errors properly|meaningful (names|variable)'
+filler+='|add comments|use descriptive'
 important_count=0; fence_count=0; n=0
 doc_files=()
-for f in README.md README.rst README CONTRIBUTING.md ARCHITECTURE.md DEVELOPMENT.md; do [[ -f "$f" ]] && doc_files+=("$f"); done
-if [[ -d docs ]]; then while IFS= read -r f; do doc_files+=("$f"); done < <(find docs -maxdepth 2 -name '*.md' 2>/dev/null | head -50); fi
+for f in README.md README.rst README CONTRIBUTING.md ARCHITECTURE.md DEVELOPMENT.md; do
+	[[ -f "$f" ]] && doc_files+=("$f")
+done
+if [[ -d docs ]]; then
+	while IFS= read -r f; do doc_files+=("$f"); done < <(find docs -maxdepth 2 -name '*.md' 2>/dev/null | head -50)
+fi
 in_fence=0
 while IFS= read -r line; do
 	n=$((n+1))
 	[[ "$line" =~ ^\`\`\` ]] && { in_fence=$((1-in_fence)); fence_count=$((fence_count+1)); continue; }
 	(( in_fence )) && continue
 	[[ -z "${line//[[:space:]]/}" ]] && continue
-	printf '%s' "$line" | grep -qiE "$filler" && add_warning "generic" "$n" "generic or self-evident phrase — an agent already knows this: $(printf '%s' "$line" | cut -c1-100)"
+	if printf '%s' "$line" | grep -qiE "$filler"; then
+		add_warning "generic" "$n" \
+			"generic or self-evident phrase — an agent already knows this: $(printf '%s' "$line" | cut -c1-100)"
+	fi
 	printf '%s' "$line" | grep -qE 'IMPORTANT|MUST|NEVER|ALWAYS' && important_count=$((important_count+1))
 	printf '%s' "$line" | grep -qiE '\b(TODO|TBD|FIXME|XXX)\b' && add_warning "placeholder" "$n" "placeholder left in file"
-	printf '%s' "$line" | grep -qiE '^\s*(this (repository|repo|project) (is|contains)|the project (is|uses))' && add_warning "overview" "$n" "project overview — agents derive this from the code and README; studies show it does not help"
+	if printf '%s' "$line" | grep -qiE '^\s*(this (repository|repo|project) (is|contains)|the project (is|uses))'; then
+		add_warning "overview" "$n" \
+			"project overview — agents derive this from the code and README; studies show it does not help"
+	fi
 	stripped="$(printf '%s' "$line" | sed -E 's/^[[:space:]]*([-*]|[0-9]+\.|#+)[[:space:]]*//; s/[[:space:]]+$//')"
 	if (( ${#stripped} >= 40 )) && (( ${#doc_files[@]} > 0 )); then
 		if grep -qF -- "$stripped" "${doc_files[@]}" 2>/dev/null; then
-			add_warning "duplicate" "$n" "verbatim in $(grep -lF -- "$stripped" "${doc_files[@]}" 2>/dev/null | head -1) — link to it instead of copying"
+			dup="$(grep -lF -- "$stripped" "${doc_files[@]}" 2>/dev/null | head -1)"
+			add_warning "duplicate" "$n" "verbatim in $dup — link to it instead of copying"
 		fi
 	fi
 done <<< "$content"
-(( important_count > 2 )) && add_warning "emphasis" 0 "$important_count lines use IMPORTANT/MUST/NEVER/ALWAYS; emphasis only works on one or two lines"
-(( fence_count > 6 )) && add_warning "code" 0 "$((fence_count/2)) code blocks; prefer file:line pointers over pasted code"
+(( important_count > 2 )) && add_warning "emphasis" 0 \
+	"$important_count lines use IMPORTANT/MUST/NEVER/ALWAYS; emphasis only works on one or two lines"
+(( fence_count > 6 )) && add_warning "code" 0 \
+	"$((fence_count/2)) code blocks; prefer file:line pointers over pasted code"
 
 # --- write ------------------------------------------------------------------
 tmp="$(mktemp "$ROOT_DIR/.AGENTS.md.XXXXXX")" || { emit_error "write" 1 "cannot create temp file"; exit 1; }
-printf '%s' "$content" > "$tmp" && chmod 644 "$tmp" && mv -f "$tmp" AGENTS.md || { rm -f "$tmp"; emit_error "write" 1 "cannot write AGENTS.md"; exit 1; }
+if ! { printf '%s' "$content" > "$tmp" && chmod 644 "$tmp" && mv -f "$tmp" AGENTS.md; }; then
+	rm -f "$tmp"; emit_error "write" 1 "cannot write AGENTS.md"; exit 1
+fi
 
 claude_result="skipped"
 case "$claude_mode" in
@@ -94,8 +133,12 @@ case "$claude_mode" in
 	import)
 		[[ -L CLAUDE.md ]] && rm -f CLAUDE.md
 		if [[ -f CLAUDE.md ]] && grep -qE '^@AGENTS\.md[[:space:]]*$' CLAUDE.md; then claude_result="import-kept"
-		else printf '@AGENTS.md\n' > CLAUDE.md || { emit_error "write" 1 "cannot write CLAUDE.md"; exit 1; }; claude_result="import-written"; fi ;;
+		else
+			printf '@AGENTS.md\n' > CLAUDE.md || { emit_error "write" 1 "cannot write CLAUDE.md"; exit 1; }
+			claude_result="import-written"
+		fi ;;
 esac
 
-printf '{"status":"ok","agents_md":{"path":"%s","lines":%s,"bytes":%s},"claude_md":{"mode":"%s","result":"%s"},"warnings":[%s]}\n' \
-	"$(json_escape "$ROOT_DIR/AGENTS.md")" "$lines" "$bytes" "$claude_mode" "$claude_result" "$warnings"
+printf '{"status":"ok","agents_md":{"path":"%s","lines":%s,"bytes":%s},' \
+	"$(json_escape "$ROOT_DIR/AGENTS.md")" "$lines" "$bytes"
+printf '"claude_md":{"mode":"%s","result":"%s"},"warnings":[%s]}\n' "$claude_mode" "$claude_result" "$warnings"

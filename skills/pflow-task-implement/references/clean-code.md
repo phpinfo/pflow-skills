@@ -27,13 +27,15 @@ A boolean flag often hides two functions: `save(draft: true)` → `saveDraft()` 
 
 ## Comments aren't a second copy of the code
 
-Prefer names and structure first. Comment only to record: intent, a non-obvious constraint, the reason for a strange decision, or a dangerous consequence.
+Prefer names and structure first. Comment only to record: intent, a non-obvious constraint, the reason for a strange
+decision, or a dangerous consequence.
 Don't comment the obvious. Don't keep commented-out code — Git has it.
 
 ## Hide details, expose meaning
 
 - Objects protect their rules; they don't just leak internals.
-- Don't scatter primitives when a value has meaning and constraints: `string email` → `Email`, `int amount` → `Money`/`Quantity`.
+- Don't scatter primitives when a value has meaning and constraints: `string email` → `Email`, `int amount` →
+  `Money`/`Quantity`.
 - Don't make a module know a chain of others' internals: `order.customer.address.city` is a coupling smell.
 
 ## Abstractions come from pressure, not imagination
@@ -44,15 +46,18 @@ Don't comment the obvious. Don't keep commented-out code — Git has it.
 
 ## Quarantine concurrency
 
-Keep async, threads, locks, and retries away from business logic — otherwise you must understand both the task and the execution order at once.
+Keep async, threads, locks, and retries away from business logic — otherwise you must understand both the task and the
+execution order at once.
 
 ## Tests are readers with authority
 
-A good test explains its scenario fast, checks observable behavior, is independent and repeatable, and fails for a clear reason. One tested idea matters more than a literal single assert.
+A good test explains its scenario fast, checks observable behavior, is independent and repeatable, and fails for a clear
+reason. One tested idea matters more than a literal single assert.
 
 ## Smells: the code asking for help
 
-Look closer when: a small change triggers a cascade; a fix breaks unrelated places; logic is scary to reuse; identical code multiplies; there are more abstractions than problem; nothing makes sense without the author.
+Look closer when: a small change triggers a cascade; a fix breaks unrelated places; logic is scary to reuse; identical
+code multiplies; there are more abstractions than problem; nothing makes sense without the author.
 
 ## Final filter
 

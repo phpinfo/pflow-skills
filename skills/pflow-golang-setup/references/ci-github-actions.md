@@ -1,6 +1,7 @@
 # GitHub Actions for Go
 
-Principles: CI runs the same gate as local (`task check`); pin action majors; cache modules; run e2e separately; fail on `go.mod`/generated drift; least-privilege permissions.
+Principles: CI runs the same gate as local (`task check`); pin action majors; cache modules; run e2e separately; fail on
+`go.mod`/generated drift; least-privilege permissions.
 
 ## `.github/workflows/ci.yml`
 
@@ -74,7 +75,8 @@ jobs:
 ```
 
 - `go-version-file: go.mod` keeps CI and `go.mod` in lockstep. For a `toolchain` line, setup-go honors it.
-- Cache key is derived from `go.sum` automatically with `cache: true`; add `cache-dependency-path` for multi-module repos.
+- Cache key is derived from `go.sum` automatically with `cache: true`; add `cache-dependency-path` for multi-module
+  repos.
 - Windows runners: set `git config core.autocrlf false` before checkout if `gofmt`/golden files differ.
 - Don't run `-race` on Windows/macOS matrices unless needed (slow); run it on Linux.
 
@@ -97,7 +99,20 @@ jobs:
         env: { GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} }
 ```
 
-Minimal `.goreleaser.yaml`: `version: 2`, `builds: [{ main: ./cmd/tool, env: [CGO_ENABLED=0], goos: [linux, darwin, windows], goarch: [amd64, arm64], ldflags: ['-s -w -X main.version={{.Version}}'] }]`, `archives`, `checksum`, `changelog: { use: github }`. Add `brews`/`nfpms`/`dockers` only when distributing that way. Sign with cosign (`signs`) for public tools.
+Minimal `.goreleaser.yaml`, plus `archives` and `checksum`:
+
+```yaml
+version: 2
+builds:
+  - main: ./cmd/tool
+    env: [CGO_ENABLED=0]
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    ldflags: ['-s -w -X main.version={{.Version}}']
+changelog: { use: github }
+```
+
+Add `brews`/`nfpms`/`dockers` only when distributing that way. Sign with cosign (`signs`) for public tools.
 
 ## Dependency updates
 
@@ -115,17 +130,21 @@ updates:
     schedule: { interval: weekly }
 ```
 
-Renovate alternative: `renovate.json` with `"extends": ["config:recommended", ":semanticCommits", "group:allNonMajor"]`, `"postUpdateOptions": ["gomodTidy", "gomodUpdateImportPaths"]`.
+Renovate alternative: `renovate.json` with `"extends": ["config:recommended", ":semanticCommits", "group:allNonMajor"]`,
+`"postUpdateOptions": ["gomodTidy", "gomodUpdateImportPaths"]`.
 
 ## Security and hygiene
 
 - `permissions: contents: read` at the top; grant more per job only. Use `${{ secrets.X }}` never echoed; mask outputs.
-- Pin third-party actions to a major (`@v5`) at least; to a SHA for supply-chain-sensitive repos (Renovate/Dependabot keep SHAs fresh).
+- Pin third-party actions to a major (`@v5`) at least; to a SHA for supply-chain-sensitive repos (Renovate/Dependabot
+  keep SHAs fresh).
 - CodeQL: `github/codeql-action` with `languages: go` for public repos; `gosec` runs already via golangci-lint.
 - Branch protection: require `check` (and `e2e` if reliable) before merge; `concurrency` cancels stale PR runs.
-- Fail on drift: `go mod tidy -diff` and `task generate-check` are part of `check`, so stale `go.sum` or generated code cannot merge.
+- Fail on drift: `go mod tidy -diff` and `task generate-check` are part of `check`, so stale `go.sum` or generated code
+  cannot merge.
 - Keep job time under ~10 min: cache, `-short` in PRs with the full suite on `main` if necessary, split e2e.
 
 ## Other hosts
 
-GitLab: `image: golang:1.26`, cache `key: { files: [go.sum] }` paths `.go/pkg/mod`, stages `check` → `e2e` → `release` running the same `task check`. The task runner keeps the pipeline definition tiny regardless of host.
+GitLab: `image: golang:1.26`, cache `key: { files: [go.sum] }` paths `.go/pkg/mod`, stages `check` → `e2e` → `release`
+running the same `task check`. The task runner keeps the pipeline definition tiny regardless of host.

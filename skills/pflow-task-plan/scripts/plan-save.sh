@@ -52,7 +52,8 @@ load_dotenv "$ROOT_DIR/.env"
 plan_filename="${PFLOW_TASKS_PLAN_FILE:-./tmp/pflow-tasks-plan.md}"
 
 if [[ -t 0 ]]; then
-	emit_error "stdin" 1 "stdin is interactive; pass the full plan non-interactively via a quoted heredoc, e.g. plan-save.sh <<'__PFLOW_PLAN_EOF__' ... __PFLOW_PLAN_EOF__"; exit 1
+	msg="stdin is interactive; pass the full plan non-interactively via a quoted heredoc,"
+	emit_error "stdin" 1 "$msg e.g. plan-save.sh <<'__PFLOW_PLAN_EOF__' ... __PFLOW_PLAN_EOF__"; exit 1
 fi
 
 content="$(cat)"

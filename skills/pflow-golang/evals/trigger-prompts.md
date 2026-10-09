@@ -1,6 +1,7 @@
 # Trigger evals — which skill should fire
 
-Run each prompt in a Go project with the three skills installed. Expected: the named skill is loaded (or none). Record misses and adjust descriptions.
+Run each prompt in a Go project with the three skills installed. Expected: the named skill is loaded (or none). Record
+misses and adjust descriptions.
 
 | # | Prompt | Expected |
 | --- | --- | --- |

@@ -1,6 +1,7 @@
 # Task runner: one gate, run everywhere
 
-Rule: `task check` (or `make check`) runs every quality step in order and is exactly what CI runs. Steps fail fast, are idempotent, and need no arguments.
+Rule: `task check` (or `make check`) runs every quality step in order and is exactly what CI runs. Steps fail fast, are
+idempotent, and need no arguments.
 
 ## Taskfile (`Taskfile.yml`, taskfile.dev)
 
@@ -75,7 +76,8 @@ tasks:
 ```
 
 - Keep `tmp/` (or `bin/`) gitignored. `sources`/`generates` make `build` incremental.
-- Pin tool versions via `go tool` so `task lint` is identical for everyone; if a binary is required instead, check it in the task (`command -v golangci-lint || …`).
+- Pin tool versions via `go tool` so `task lint` is identical for everyone; if a binary is required instead, check it in
+  the task (`command -v golangci-lint || …`).
 - E2E and anything needing external services stays out of `check`; CI runs it as a separate job with the service.
 
 ## Makefile equivalent
@@ -109,8 +111,11 @@ Tabs, not spaces, for recipe lines. `.PHONY` everything that isn't a file.
 
 ## Conventions
 
-- Names: `build`, `test`, `test-race`, `lint`, `fmt`, `check`, `generate`, `clean` — same across all Go projects so muscle memory works.
+- Names: `build`, `test`, `test-race`, `lint`, `fmt`, `check`, `generate`, `clean` — same across all Go projects so
+  muscle memory works.
 - Every target prints nothing on success beyond the tools' own output; failures exit non-zero.
 - Coverage thresholds apply to an allowlist of packages with logic, not to `cmd/` or generated code.
-- Document the runner in `AGENTS.md`/`README.md` with a two-column table: task → command. Agents and humans read the same table.
-- `.pre-commit` or `lefthook.yml`: `fmt` + `lint --new-from-rev=HEAD --fix` on staged files; never the full `check` (too slow for commits).
+- Document the runner in `AGENTS.md`/`README.md` with a two-column table: task → command. Agents and humans read the
+  same table.
+- `.pre-commit` or `lefthook.yml`: `fmt` + `lint --new-from-rev=HEAD --fix` on staged files; never the full `check` (too
+  slow for commits).

@@ -129,7 +129,8 @@ fi
 if [[ ! -f "$COMMIT_LIB" ]] || ! command -v git >/dev/null 2>&1; then
 	reason="pflow-commit is not installed"
 	[[ -f "$COMMIT_LIB" ]] && reason="git binary is not available"
-	warning="$reason — task closed via mdtodo, all git steps skipped. Install: npx skills add phpinfo/pflow-skills -s pflow-commit"
+	warning="$reason — task closed via mdtodo, all git steps skipped."
+	warning+=" Install: npx skills add phpinfo/pflow-skills -s pflow-commit"
 	printf '⚠️ %s\n' "$warning" >&2
 	printf '{"status":"closed_no_git","git":"skipped","task":"%s","warning":"%s"}\n' \
 		"$(tf_escape "$task")" "$(tf_escape "$warning")"
@@ -264,7 +265,11 @@ fi
 commit_hash_json="null"
 [[ -n "$commit_hash" ]] && commit_hash_json="\"$commit_hash\""
 
-printf '{"status":"finished","task":"%s","slug":"%s","task_branch":"%s","dev_branch":"%s","started_on":"%s","commit_hash":%s,"commit_status":"%s","merge_status":"%s","push_status_task":"%s","push_status_dev":"%s","delete_local_status":"%s","delete_remote_status":"%s"}\n' \
+fmt='{"status":"finished","task":"%s","slug":"%s","task_branch":"%s","dev_branch":"%s","started_on":"%s",'
+fmt+='"commit_hash":%s,"commit_status":"%s","merge_status":"%s","push_status_task":"%s","push_status_dev":"%s",'
+fmt+='"delete_local_status":"%s","delete_remote_status":"%s"}\n'
+# shellcheck disable=SC2059
+printf "$fmt" \
 	"$(tf_escape "$task")" "$(tf_escape "$slug")" "$(tf_escape "$task_branch")" \
 	"$(tf_escape "$dev_branch")" "$(tf_escape "$started_on")" "$commit_hash_json" \
 	"$commit_status" "$merge_status" "$push_status_task" "$push_status_dev" \

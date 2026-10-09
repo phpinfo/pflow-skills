@@ -44,6 +44,7 @@ name: <kebab-case>
 description: >-
   <third person: what + when, ≤1024 chars, wrapped at 120>
 license: MIT
+disable-model-invocation: true  # manual-only skills
 allowed-tools:
   - Bash(.agents/skills/<name>/scripts/<script>)
 ---
@@ -77,4 +78,6 @@ ROOT_DIR="$(cd "$SKILL_DIR/../../.." && pwd)"
 - Every SKILL.md line must earn its tokens.
 - Lines ≤120 characters in every skill file; tables, code blocks and lines with URLs are exempt.
 - `allowed-tools` uses installed path `.agents/skills/<name>/scripts/...`.
+- Manual-only skills set `disable-model-invocation: true`; a description saying "Invoked manually" does not stop
+  auto-invocation.
 - Ask about corner cases; never guess user intent.

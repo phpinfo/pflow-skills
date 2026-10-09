@@ -1,6 +1,7 @@
 # SOLID: five principles of OO design
 
-Definitions the model already knows are useless here. What matters: the **smell** that signals a violation and the **fix**.
+Definitions the model already knows are useless here. What matters: the **smell** that signals a violation and the
+**fix**.
 
 ## S — Single Responsibility
 
@@ -14,13 +15,15 @@ One reason to change. If describing the class needs "and" (validates *and* saves
 Add behavior without editing working code.
 
 - **Smell:** a growing `switch`/`if` on a type tag that you extend for every new case.
-- **Fix:** make the varying part a strategy/polymorphic type; new case = new class, not a new branch. Don't pre-build this for two stable, unchanging cases.
+- **Fix:** make the varying part a strategy/polymorphic type; new case = new class, not a new branch. Don't pre-build
+  this for two stable, unchanging cases.
 
 ## L — Liskov Substitution
 
 A subtype must work everywhere its base type does, without surprises.
 
-- **Smell:** overrides that throw `NotSupported`, tighten inputs, weaken outputs, or need `instanceof` checks at call sites.
+- **Smell:** overrides that throw `NotSupported`, tighten inputs, weaken outputs, or need `instanceof` checks at call
+  sites.
 - **Fix:** if a subtype can't honor the contract, it isn't a subtype — prefer composition over inheritance.
 
 ## I — Interface Segregation

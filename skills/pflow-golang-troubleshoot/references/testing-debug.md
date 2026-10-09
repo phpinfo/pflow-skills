@@ -15,7 +15,8 @@ go vet ./... && go test -count=1 -cover -coverprofile=c.out ./... && go tool cov
 - `-count=1` always while debugging: cached "ok" hides flakes. `-v` shows `t.Log` output and subtest names.
 - Subtest names in `-run` are regexes joined with `/`; spaces become `_`.
 - `-run` with `-bench` needs `-run '^$'` to skip tests.
-- Prefer the project's runner target when it sets env/tags (`task test`, `make test-race`); read it to learn the exact flags.
+- Prefer the project's runner target when it sets env/tags (`task test`, `make test-race`); read it to learn the exact
+  flags.
 
 ## Failure patterns
 
@@ -36,8 +37,10 @@ go vet ./... && go test -count=1 -cover -coverprofile=c.out ./... && go tool cov
 ## Techniques
 
 - Make the failing case first in the table and run only it. Then binary-search the table if the interaction matters.
-- `t.Log` everything you assert on; `t.Logf("%+v", got)`. `t.Skip` other cases temporarily — never commit skips without an issue link.
-- Deterministic inputs: `rand.New(rand.NewPCG(1, 2))` injected; fixed `time.Time` via injected clock; `t.TempDir()` for files; `t.Setenv` for env (disables parallel; if the code reads env at init, refactor).
+- `t.Log` everything you assert on; `t.Logf("%+v", got)`. `t.Skip` other cases temporarily — never commit skips without
+  an issue link.
+- Deterministic inputs: `rand.New(rand.NewPCG(1, 2))` injected; fixed `time.Time` via injected clock; `t.TempDir()` for
+  files; `t.Setenv` for env (disables parallel; if the code reads env at init, refactor).
 - Isolate side effects: does the test write to a real DB/network? Move behind a tag and fake it in unit tests.
 - Diff structures with `cmp.Diff(want, got, cmpopts.IgnoreFields(T{}, "UpdatedAt"), cmpopts.EquateEmpty())`.
 - Run with the race detector before declaring a test "flaky"; most flakiness is a race.
@@ -47,4 +50,6 @@ go vet ./... && go test -count=1 -cover -coverprofile=c.out ./... && go tool cov
 
 ## Test infra smells to fix while you're there
 
-- `time.Sleep` for synchronization; `init()` in tests; global mutable fixtures; tests depending on ordering; `os.Exit` in test helpers; `panic` in table data setup; ignored `Close()` errors on temp resources; tests that print instead of asserting.
+- `time.Sleep` for synchronization; `init()` in tests; global mutable fixtures; tests depending on ordering; `os.Exit`
+  in test helpers; `panic` in table data setup; ignored `Close()` errors on temp resources; tests that print instead of
+  asserting.

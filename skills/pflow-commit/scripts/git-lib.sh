@@ -89,12 +89,12 @@ print_json_error() {
 	escaped_push_status="$(json_escape "$push_status")"
 	escaped_error="$(json_escape "$error_output")"
 	if [[ -z "$commit_hash" ]]; then
-		printf '{"commit_hash":null,"branch_name":"%s","push_status":"%s","error":{"step":"%s","exit_code":%d,"message":"%s"}}\n' \
-			"$escaped_branch" "$escaped_push_status" "$escaped_step" "$exit_code" "$escaped_error"
+		printf '{"commit_hash":null,'
 	else
-		printf '{"commit_hash":"%s","branch_name":"%s","push_status":"%s","error":{"step":"%s","exit_code":%d,"message":"%s"}}\n' \
-			"$commit_hash" "$escaped_branch" "$escaped_push_status" "$escaped_step" "$exit_code" "$escaped_error"
+		printf '{"commit_hash":"%s",' "$commit_hash"
 	fi
+	printf '"branch_name":"%s","push_status":"%s","error":{"step":"%s","exit_code":%d,"message":"%s"}}\n' \
+		"$escaped_branch" "$escaped_push_status" "$escaped_step" "$exit_code" "$escaped_error"
 }
 
 # git_commit_subject <message>

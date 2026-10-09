@@ -1,6 +1,8 @@
 # golangci-lint v2 configuration
 
-Install pinned: `go get -tool github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest` → `go tool golangci-lint run` (slow first build) — or the official install script / binary with the version written in the task runner and CI. v1 configs must be migrated: `golangci-lint migrate`.
+Install pinned: `go get -tool github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest` →
+`go tool golangci-lint run` (slow first build) — or the official install script / binary with the version written in the
+task runner and CI. v1 configs must be migrated: `golangci-lint migrate`.
 
 ## Recommended `.golangci.yml`
 
@@ -81,23 +83,33 @@ issues:
   max-same-issues: 0
 ```
 
-Remove `rowserrcheck; sqlclosecheck` if no `database/sql`; remove `modernize` if the installed golangci-lint predates it (`golangci-lint help linters | grep modernize`). Start strict on a new project; on an existing one enable in batches and use `--new-from-rev=origin/main` to lint only changes while paying down the backlog.
+Remove `rowserrcheck; sqlclosecheck` if no `database/sql`; remove `modernize` if the installed golangci-lint predates it
+(`golangci-lint help linters | grep modernize`). Start strict on a new project; on an existing one enable in batches and
+use `--new-from-rev=origin/main` to lint only changes while paying down the backlog.
 
 ## Running
 
-- `golangci-lint run ./...`; `--fix` applies formatters and auto-fixable linters; `--new-from-rev=HEAD~1` for incremental; `-v` to see timing; `--out-format` unnecessary in v2 (use `output.formats`).
+- `golangci-lint run ./...`; `--fix` applies formatters and auto-fixable linters; `--new-from-rev=HEAD~1` for
+  incremental; `-v` to see timing; `--out-format` unnecessary in v2 (use `output.formats`).
 - Format only: `golangci-lint fmt ./...` (v2). Check without writing: `golangci-lint fmt --diff`.
 - Cache lives in `~/.cache/golangci-lint`; in CI use the official action with caching or cache that dir.
-- Pre-commit: run `golangci-lint run --new-from-rev=HEAD --fix` on staged Go files (lefthook/pre-commit); keep the full run for `task check` and CI.
+- Pre-commit: run `golangci-lint run --new-from-rev=HEAD --fix` on staged Go files (lefthook/pre-commit); keep the full
+  run for `task check` and CI.
 
 ## `nolint` policy
 
-- Form: `//nolint:gosec // G304: path is validated above` — specific linter, reason, on the offending line (or above a declaration). `nolintlint` rejects bare `//nolint`.
-- Prefer fixing or configuring an exclusion rule (path/text based) over per-line suppressions when the pattern is systemic.
+- Form: `//nolint:gosec // G304: path is validated above` — specific linter, reason, on the offending line (or above a
+  declaration). `nolintlint` rejects bare `//nolint`.
+- Prefer fixing or configuring an exclusion rule (path/text based) over per-line suppressions when the pattern is
+  systemic.
 - Never suppress `errcheck`, `govet`, `staticcheck` SA* without explaining the invariant that makes it safe.
 
 ## Pairing linters with the code
 
-- `errorlint` + `errname` enforce `errors-safety.md`; `testifylint` + `thelper` + `usetesting` enforce `testing.md`; `modernize` + `intrange` + `copyloopvar` enforce `modernize.md`; `gosec` + `noctx` + `bodyclose` enforce `security.md`.
-- `exhaustive` requires typed enums; `revive exported` requires doc comments on exported symbols — decide once in the project.
-- Speed: `run.concurrency`, disable `gocritic` `experimental` tag, exclude generated directories; a full run should stay under a few minutes.
+- `errorlint` + `errname` enforce `errors-safety.md`; `testifylint` + `thelper` + `usetesting` enforce `testing.md`;
+  `modernize` + `intrange` + `copyloopvar` enforce `modernize.md`; `gosec` + `noctx` + `bodyclose` enforce
+  `security.md`.
+- `exhaustive` requires typed enums; `revive exported` requires doc comments on exported symbols — decide once in the
+  project.
+- Speed: `run.concurrency`, disable `gocritic` `experimental` tag, exclude generated directories; a full run should stay
+  under a few minutes.

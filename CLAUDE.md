@@ -11,15 +11,15 @@ A catalog of [Agent Skills](https://docs.claude.com/en/docs/claude-code/skills) 
 Skills live under `skills/<name>/`. Each skill is a self-contained unit:
 
 - `SKILL.md` — YAML frontmatter (`name`, `description`, `allowed-tools`) + minimal instructions for the agent.
-- `scripts/` — executable helpers the skill calls. Scripts are referenced by their **installed** path (`.claude/skills/<name>/scripts/...`), not their path in this repo.
+- `scripts/` — executable helpers the skill calls. Scripts are referenced by their **installed** path (`.agents/skills/<name>/scripts/...`), not their path in this repo.
 
 ## Conventions that matter
 
-- **Installed-path assumption in scripts.** `scripts/git-commit-push.sh` derives the project root as `SKILL_DIR/../../..`, which only resolves correctly once the skill is installed at `.claude/skills/<name>/`. Keep this 3-levels-up layout when adding scripts that need the consuming repo's root.
-- **`allowed-tools` paths must match the skill folder name.** When renaming or adding a skill, update the `Bash(.claude/skills/<name>/scripts/...)` entries in `SKILL.md` to the new folder name, or the agent won't be granted permission to run them.
-- **Keep SKILL.md minimal.** The body should be the shortest instruction set that still works; push detail/logic into scripts rather than prose. The `description` is the trigger signal — make it state what the skill does and when it fires.
+- **Installed-path assumption in scripts.** `scripts/git-commit-push.sh` derives the project root as `SKILL_DIR/../../..`, which only resolves correctly once the skill is installed at `.agents/skills/<name>/`. Keep this 3-levels-up layout when adding scripts that need the consuming repo's root.
+- **`allowed-tools` paths must match the skill folder name.** When renaming or adding a skill, update the `Bash(.agents/skills/<name>/scripts/...)` entries in `SKILL.md` to the new folder name, or the agent won't be granted permission to run them.
+- **Keep SKILL.md minimal.** The body should be the shortest instruction set that still works; push detail/logic into scripts rather than prose. The `description` is the trigger signal — make it state what the skill does and when it fires. Skills that must only run on an explicit user request set `disable-model-invocation: true` in the frontmatter; "Invoked manually only" in the description alone does not stop auto-invocation.
 - **Conventional Commits, one line.** `pflow-commit` writes single-line Conventional Commit subjects in English, imperative mood (`feat: add ...`, not `added`) — no body, footers, or `Co-Authored-By` trailers. `git-lib.sh` enforces this for every skill that commits through it by keeping only the first non-blank line of the message.
-- **Lines ≤120 characters** in skill files; tables, code blocks and lines with URLs are exempt. `pflow-skill` checks changed files.
+- **Lines ≤120 characters** in skill files, scripts included; tables, code blocks and lines with URLs are exempt. `pflow-skill` checks changed files.
 
 ## Adding a skill
 

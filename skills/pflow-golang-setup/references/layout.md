@@ -1,6 +1,7 @@
 # Project layout
 
-Start flat; add directories when a second thing of the same kind appears. The Go team's guidance (go.dev/doc/modules/layout) beats "standard project layout" templates.
+Start flat; add directories when a second thing of the same kind appears. The Go team's guidance
+(go.dev/doc/modules/layout) beats "standard project layout" templates.
 
 ## Shapes
 
@@ -14,34 +15,46 @@ Start flat; add directories when a second thing of the same kind appears. The Go
 
 ## Directories
 
-- `cmd/<binary>/main.go` — parse flags/config, build dependencies, call `run(ctx, cfg) error`, exit code. No business logic.
-- `internal/` — everything not importable by other modules. Name packages by what they provide: `internal/config`, `internal/storage/postgres`, `internal/api/http`, `internal/usecase` (application services), `internal/models` only if truly shared data types (prefer types living with their owner).
+- `cmd/<binary>/main.go` — parse flags/config, build dependencies, call `run(ctx, cfg) error`, exit code. No business
+  logic.
+- `internal/` — everything not importable by other modules. Name packages by what they provide: `internal/config`,
+  `internal/storage/postgres`, `internal/api/http`, `internal/usecase` (application services), `internal/models` only if
+  truly shared data types (prefer types living with their owner).
 - `pkg/` — only for code deliberately importable by others; most projects don't need it. If unsure, use `internal/`.
-- `api/` — proto/OpenAPI definitions and generated clients when the API is a first-class artifact (`api/proto`, `api/gen`).
+- `api/` — proto/OpenAPI definitions and generated clients when the API is a first-class artifact (`api/proto`,
+  `api/gen`).
 - `tests/` or `test/` — black-box/e2e tests and their fixtures, behind a build tag; unit tests stay next to code.
 - `testdata/` — ignored by the toolchain; per-package fixtures and golden files.
 - `scripts/` — repo automation not worth a Go program; prefer task runner targets calling `go run ./tools/...`.
 - `tools/` or `go tool` directives — dev tools; with Go ≥ 1.24 use `tool` in `go.mod` and drop `tools.go`.
 - `docs/`, `deploy/`, `configs/`, `build/` (Dockerfiles, packaging) as needed. `tmp/`/`bin/`/`dist/` gitignored.
-- Never: `src/`, `common/`, `util/`, `helpers/`, `models/` catch-alls, `pkg/` as a dumping ground, deeply nested `internal/pkg/x/y/z` for one file.
+- Never: `src/`, `common/`, `util/`, `helpers/`, `models/` catch-alls, `pkg/` as a dumping ground, deeply nested
+  `internal/pkg/x/y/z` for one file.
 
 ## Package design
 
-- Package = one cohesive concept with a small exported surface. Fewer, larger packages beat many tiny ones; split when a package needs two different sets of dependencies or two teams own it.
-- Dependencies point inward: `cmd` → `internal/api` → `internal/usecase` → `internal/domain`; storage/transport implement interfaces defined by the layer that uses them. No cycles by construction.
-- File per concept inside a package (`user.go`, `user_repo.go`, `user_test.go`); `doc.go` for the package comment when the package is large.
+- Package = one cohesive concept with a small exported surface. Fewer, larger packages beat many tiny ones; split when a
+  package needs two different sets of dependencies or two teams own it.
+- Dependencies point inward: `cmd` → `internal/api` → `internal/usecase` → `internal/domain`; storage/transport
+  implement interfaces defined by the layer that uses them. No cycles by construction.
+- File per concept inside a package (`user.go`, `user_repo.go`, `user_test.go`); `doc.go` for the package comment when
+  the package is large.
 - `main` packages import `internal/...`; nothing imports `main`.
-- Generated code in its own package/directory (`gen/`, `*pb.go`) with a `// Code generated` header; never mixed with hand-written files.
+- Generated code in its own package/directory (`gen/`, `*pb.go`) with a `// Code generated` header; never mixed with
+  hand-written files.
 
 ## Configuration
 
-- Precedence: flags > env > config file > defaults; one `Config` struct, one `Load()` function, validated once at startup. Secrets only via env/secret manager.
+- Precedence: flags > env > config file > defaults; one `Config` struct, one `Load()` function, validated once at
+  startup. Secrets only via env/secret manager.
 - Default config path in the user's home for CLIs (`~/.tool.yml`); XDG dirs (`os.UserConfigDir()`) when being polite.
-- Keep parsing (`flag`, `urfave/cli`, `cobra`, `env`, `yaml`) in `cmd/` or `internal/config`; the rest of the code receives typed values.
+- Keep parsing (`flag`, `urfave/cli`, `cobra`, `env`, `yaml`) in `cmd/` or `internal/config`; the rest of the code
+  receives typed values.
 
 ## Workspaces and multi-module
 
-- `go.work` for local development across modules; **don't commit** it unless the whole team works that way (add `go.work*` to `.gitignore` otherwise). CI builds each module standalone (`GOWORK=off`).
+- `go.work` for local development across modules; **don't commit** it unless the whole team works that way (add
+  `go.work*` to `.gitignore` otherwise). CI builds each module standalone (`GOWORK=off`).
 - Tag sub-modules with their path prefix: `git tag lib/v1.2.0`.
 - Nested modules only when release cadence or dependency footprint truly differs; otherwise one module.
 

@@ -51,7 +51,8 @@ has_dep "github.com/stretchr/testify" && testing+=("testify")
 mockery_cfg=""
 for f in .mockery.yml .mockery.yaml; do [[ -f "$ROOT_DIR/$f" ]] && mockery_cfg="$f" && break; done
 if [[ -n "$mockery_cfg" ]] || grep -q "github.com/vektra/mockery" <<<"$direct$tools" \
-	|| grep -rIl --include='*.go' --exclude-dir=vendor --exclude-dir=.git -m1 'go:generate.*mockery' "$ROOT_DIR" >/dev/null 2>&1; then
+	|| grep -rIl --include='*.go' --exclude-dir=vendor --exclude-dir=.git -m1 'go:generate.*mockery' "$ROOT_DIR" \
+		>/dev/null 2>&1; then
 	testing+=("mockery")
 fi
 has_dep "go.uber.org/mock" && testing+=("gomock")
@@ -63,7 +64,9 @@ has_dep "golang.org/x/sync" && other+=("x/sync")
 has_dep "github.com/samber/oops" && other+=("samber/oops")
 
 golangci=""
-for f in .golangci.yml .golangci.yaml .golangci.toml .golangci.json; do [[ -f "$ROOT_DIR/$f" ]] && golangci="$f" && break; done
+for f in .golangci.yml .golangci.yaml .golangci.toml .golangci.json; do
+	[[ -f "$ROOT_DIR/$f" ]] && golangci="$f" && break
+done
 runner=""
 for f in Taskfile.yml Taskfile.yaml Makefile justfile; do [[ -f "$ROOT_DIR/$f" ]] && runner="$f" && break; done
 gowork=0; [[ -f "$ROOT_DIR/go.work" ]] && gowork=1
@@ -78,7 +81,10 @@ for t in "${testing[@]:-}"; do
 done
 for o in "${other[@]:-}"; do [[ "$o" == "samber/lo" ]] && refs+=("references/lib-samber-lo.md"); done
 
-printf '{"status":"ok","root":%s,"module":%s,"go_version":%s,"toolchain":%s,"cli":%s,"rpc":%s,"testing":%s,"other":%s,"golangci_config":%s,"task_runner":%s,"go_work":%s,"lib_references":%s}\n' \
-	"$(json_str "$ROOT_DIR")" "$(json_str "$module")" "$(json_str "$go_version")" "$(json_str "$toolchain")" \
-	"$(json_str "$cli")" "$(json_str "$rpc")" "$(json_arr "${testing[@]:-}")" "$(json_arr "${other[@]:-}")" \
-	"$(json_str "$golangci")" "$(json_str "$runner")" "$( ((gowork)) && printf true || printf false)" "$(json_arr "${refs[@]:-}")"
+printf '{"status":"ok","root":%s,"module":%s,"go_version":%s,"toolchain":%s,' \
+	"$(json_str "$ROOT_DIR")" "$(json_str "$module")" "$(json_str "$go_version")" "$(json_str "$toolchain")"
+printf '"cli":%s,"rpc":%s,"testing":%s,"other":%s,' \
+	"$(json_str "$cli")" "$(json_str "$rpc")" "$(json_arr "${testing[@]:-}")" "$(json_arr "${other[@]:-}")"
+printf '"golangci_config":%s,"task_runner":%s,"go_work":%s,"lib_references":%s}\n' \
+	"$(json_str "$golangci")" "$(json_str "$runner")" "$( ((gowork)) && printf true || printf false)" \
+	"$(json_arr "${refs[@]:-}")"
