@@ -4,7 +4,8 @@ set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-SKILLS_DIR="$(cd "$SKILL_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$SKILL_DIR/../../.." && pwd)"
+SKILLS_DIR="$ROOT_DIR/skills"
 
 json_escape() {
 	local value="$1"
@@ -31,9 +32,22 @@ for dir in */; do
 
 	desc=""
 	in_fm=0
+	folded=0
 	while IFS= read -r line; do
 		[[ "$line" == "---" ]] && { in_fm=$((1 - in_fm)); ((in_fm == 0)) && break; continue; }
-		((in_fm == 1)) && [[ "$line" =~ ^description:[[:space:]]*(.*) ]] && desc="${BASH_REMATCH[1]}"
+		((in_fm == 1)) || continue
+		if ((folded == 1)); then
+			# Folded block scalar (description: >-): indented lines join with spaces.
+			if [[ "$line" =~ ^[[:space:]]+(.*) ]]; then
+				desc="${desc:+$desc }${BASH_REMATCH[1]}"
+				continue
+			fi
+			folded=0
+		fi
+		if [[ "$line" =~ ^description:[[:space:]]*(.*) ]]; then
+			desc="${BASH_REMATCH[1]}"
+			[[ "$desc" =~ ^[\>\|]-?$ ]] && { desc=""; folded=1; }
+		fi
 	done < "$dir/SKILL.md"
 
 	scripts="[]"

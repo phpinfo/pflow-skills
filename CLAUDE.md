@@ -19,6 +19,7 @@ Skills live under `skills/<name>/`. Each skill is a self-contained unit:
 - **`allowed-tools` paths must match the skill folder name.** When renaming or adding a skill, update the `Bash(.claude/skills/<name>/scripts/...)` entries in `SKILL.md` to the new folder name, or the agent won't be granted permission to run them.
 - **Keep SKILL.md minimal.** The body should be the shortest instruction set that still works; push detail/logic into scripts rather than prose. The `description` is the trigger signal — make it state what the skill does and when it fires.
 - **Conventional Commits, one line.** `pflow-commit` writes single-line Conventional Commit subjects in English, imperative mood (`feat: add ...`, not `added`) — no body, footers, or `Co-Authored-By` trailers. `git-lib.sh` enforces this for every skill that commits through it by keeping only the first non-blank line of the message.
+- **Lines ≤120 characters** in skill files; tables, code blocks and lines with URLs are exempt. `pflow-skill` checks changed files.
 
 ## Adding a skill
 

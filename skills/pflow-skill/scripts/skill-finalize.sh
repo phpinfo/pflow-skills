@@ -4,7 +4,9 @@ set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-SKILLS_DIR="$(cd "$SKILL_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$SKILL_DIR/../../.." && pwd)"
+SKILLS_DIR="$ROOT_DIR/skills"
+MAX_LINE=120
 
 json_escape() {
 	local value="$1"
@@ -27,7 +29,7 @@ while [[ $# -gt 0 ]]; do
 	case "$1" in
 		--name|-n) name="${2:-}"; shift 2 ;;
 		-h|--help)
-			emit_error "usage" 1 'Usage: skill-add-finalize.sh --name "<name>"'
+			emit_error "usage" 1 'Usage: skill-finalize.sh --name "<name>"'
 			exit 1 ;;
 		*) emit_error "usage" 1 "Unknown argument: $1"; exit 1 ;;
 	esac
@@ -62,4 +64,26 @@ if [[ -d "$scripts_dir" ]]; then
 	done
 fi
 
-printf '{"status":"ok","skill_dir":"%s","scripts_chmod":%d}\n' "$(json_escape "$target")" "$chmod_count"
+# Lint only files changed or untracked in git, so untouched legacy files don't block an edit.
+changed=$(git -C "$ROOT_DIR" status --porcelain --untracked-files=all -- "skills/$name" 2>/dev/null \
+	| sed -E 's/^.. //; s/^.* -> //')
+[[ -z "$changed" ]] && ! git -C "$ROOT_DIR" rev-parse --git-dir >/dev/null 2>&1 \
+	&& changed=$(cd "$ROOT_DIR" && find "skills/$name" -type f)
+
+long_lines=""
+while IFS= read -r rel; do
+	[[ -n "$rel" && -f "$ROOT_DIR/$rel" ]] || continue
+	while IFS= read -r hit; do
+		[[ -n "$long_lines" ]] && long_lines="$long_lines,"
+		long_lines="$long_lines\"$(json_escape "$rel:$hit")\""
+	done < <(MAX="$MAX_LINE" MD="$([[ "$rel" == *.md ]] && echo 1)" perl -CSD -ne '
+		# Tables, fenced code blocks (markdown only) and lines with URLs are exempt; length counts characters.
+		chomp;
+		if ($ENV{MD} && /^\s*(```|~~~)/) { $fence = !$fence; next }
+		next if $fence || ($ENV{MD} && /^\s*\|/) || m{https?://};
+		print "$.:", length, "\n" if length > $ENV{MAX};
+	' "$ROOT_DIR/$rel")
+done <<< "$changed"
+
+printf '{"status":"ok","skill_dir":"%s","scripts_chmod":%d,"long_lines":[%s]}\n' \
+	"$(json_escape "$target")" "$chmod_count" "$long_lines"
