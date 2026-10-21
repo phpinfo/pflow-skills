@@ -1,9 +1,8 @@
 ---
 name: pflow-docs
 description: >-
-  Writing rules for user docs — README, docs/, root-level Markdown for people (CONTRIBUTING, CHANGELOG…) or whatever
-  AGENTS.md/CLAUDE.md declares. Plain style, no AI-writing tells. Use when writing, editing or reviewing them; not for
-  agent instructions or code comments.
+  Writing rules for user docs: README, docs/, other Markdown for people. Load before writing, editing or reviewing
+  them, even a small update during a code task; not for agent instructions or code comments.
 license: MIT
 ---
 
@@ -29,6 +28,9 @@ wins. Vendor, clipped or generated text is read-only.
 ## Content
 
 - Write for someone who has not seen the code or this conversation, as you would explain it to a colleague out loud.
+- Say what the reader runs, sets and gets, not how it works inside. Leave out internal steps, code excerpts and
+  mechanics (temp files, markers, which file gets patched) unless the reader needs them to use, configure or fix the
+  thing, or the document exists to explain the internals.
 - Every sentence adds a new fact. Cut run-ups ("It's worth noting", "Let's dive in"), closers that restate, "not X but
   Y" when nobody claimed X, and replies to objections nobody raised.
 - Do not inflate ("key", "crucial", "robust", "seamless", "plays a role", "ensures"): say what breaks without it or what
